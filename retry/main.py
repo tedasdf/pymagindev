@@ -97,12 +97,13 @@ def make_file_group(tree, file_path):
 
     # ## NEW VERSION NEXT PR MAKE ROOT NODE FOR FILE GROUP
     file_inst.root_node, file_inst.constant_list = language.make_root_node(body_trees)
-
+    print(file_inst.root_node)
+    print(file_inst.imported_list)
     ## the if statement is inflexible so NEXT PR need to figure out how to improve that 
     for subgroup_tree in subgroup_trees:
         file_inst.add_classes_list(language.make_class(subgroup_tree, parent=file_inst))
     
-    print(file_inst.classes_list)
+    # print(file_inst.classes_list)
     print("=================================================================================================")
     return file_inst
 

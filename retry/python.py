@@ -49,6 +49,9 @@ def get_call_from_func_element(func):
     if type(func) in (ast.Subscript, ast.Call):
         return None
 
+def get_attr_from_non_func_element(attr):
+    return( attr.id , attr.attr)
+
 def process_assign(element):
     """
     Process an assignment AST node to extract variables and associated calls.
@@ -58,17 +61,27 @@ def process_assign(element):
     :return: A list of Variable instances or an empty list if no valid assignment is found.
     """
     def extract_calls(value):
-        """Recursively extract all calls and attributes from a BinOp."""
+        """Recursively extract all calls, attributes, and variables."""
         calls = []
         if isinstance(value, ast.BinOp):  # Handle nested binary operations
             calls.extend(extract_calls(value.left))
             calls.extend(extract_calls(value.right))
         elif isinstance(value, ast.Call):  # Handle function calls
             calls.append(get_call_from_func_element(value.func))
+            for arg in value.args:
+                calls.extend(extract_calls(arg))  # Process arguments
         elif isinstance(value, ast.Attribute):  # Handle attributes like `dict.keys`
-            calls.append(get_call_from_func_element(value))
+            # Extract parent and attribute
+            parent = extract_calls(value.value) if isinstance(value.value, ast.Attribute) else value.value.id
+            calls.append((parent, value.attr))  # Tuple of parent and attribute
         elif isinstance(value, ast.Name):  # Handle simple variable names
-            calls.append(value.id)  # Add the variable name
+            calls.append(value.id)
+        elif isinstance(value, ast.Subscript):  # Handle subscripts
+            calls.extend(extract_calls(value.value))  # Extract from the subscripted element
+            if hasattr(value, 'slice') and isinstance(value.slice, (ast.Name, ast.Attribute)):
+                calls.extend(extract_calls(value.slice))
+        else:
+            print(f"Unsupported AST node: {type(value).__name__}")
         return calls
 
     def extract_targets(target):
@@ -79,12 +92,15 @@ def process_assign(element):
         elif isinstance(target, ast.Tuple):  # Handle tuple unpacking
             for elt in target.elts:  # Recursively process tuple elements
                 variables.extend(extract_targets(elt))
+        elif isinstance(target, ast.Attribute):  # Handle attributes
+            variables.append((target.value.id, target.attr))  # Tuple of parent and attribute
         return variables
     
-    if not isinstance(element.value, (ast.BinOp, ast.Call, ast.Attribute)):
+    if not isinstance(element.value, (ast.BinOp, ast.Call, ast.Attribute, ast.Subscript)):
         return []  # Ignore non-call or non-operation assignments
 
     calls = extract_calls(element.value)
+
     if not calls:  # No valid calls extracted
         return []
 
@@ -92,17 +108,20 @@ def process_assign(element):
     for target in element.targets:
         # Extract all variable names from the target
         variable_names = extract_targets(target)
+        print("VAR", variable_names)
         for token in variable_names:
             ret.append(Variable(token, calls, element.lineno))
-        
     return ret
 
 def make_operations(lines , is_root=False):
     operation = []
     for tree in lines:
+        print(ast.dump(tree, indent=4))
+        print()
         if is_root and check_rootnode(tree):
             return make_operations(tree.body)
         elif type(tree) == ast.Assign:
+            print("YES")
             operation.append(process_assign(tree))
         elif type(tree) in AstControlType:
             line_no = tree.lineno
@@ -267,15 +286,15 @@ class Python():
         processes = make_operations(tree.body)
         docstring = ast.get_docstring(tree)
         
-        print("PROCESS START ")
-        for pro in processes:
-            if isinstance(pro, LogicStatement):
-                print(pro)
-                for i in pro.process:
-                    print(i)
-            else:
-                print(pro)
-        print("PROCESS END")
+        # print("PROCESS START ")
+        # for pro in processes:
+        #     if isinstance(pro, LogicStatement):
+        #         print(pro)
+        #         for i in pro.process:
+        #             print(i)
+        #     else:
+        #         print(pro)
+        # print("PROCESS END")
 
         return UserDefinedFunc(
             token, 
@@ -287,14 +306,15 @@ class Python():
         )
     
     @staticmethod
-    def make_class(tree,parent):
+    def make_class(tree, parent):
         assert type(tree) == ast.ClassDef
-        _, node_trees, _ , _ = Python.separate_namespaces(tree)
+        _, node_trees, body_trees , _ = Python.separate_namespaces(tree)
 
         token = tree.name
         print("Class name",token)
         line_number = tree.lineno
         inherits = get_inherits(tree) 
+        print(inherits)
 
         class_group = UserDefinedClass(token,line_number, inherits)
         for node_tree in node_trees:

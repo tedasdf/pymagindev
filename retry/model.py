@@ -39,7 +39,7 @@ class UserDefinedClass():
         self.token = token
         self.line_number = line_number
         self.functions = []
-        self.attribute = []
+        self.attribute = None
         self.inherits = inherits
     
     def __repr__(self):
@@ -140,7 +140,7 @@ class Variable():
         """
         assert token
         self.token = token
-        self.points_to = points_to
+        self.points_to = points_to # if it is a list then it shows the dependent variable , if other itsother.
         self.line_number = line_number
 
     def __repr__(self):

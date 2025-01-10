@@ -138,6 +138,7 @@ def make_operations(lines , is_root=False):
             cond_type = 'if'
             subtree = tree.body
             process = make_operations(subtree)
+            else_branch = None
             if len(tree.orelse) != 0:
                 else_branch = make_operations(tree.orelse)           
             logic_inst = LogicStatement(cond_type, process, line_no , else_branch)

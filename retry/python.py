@@ -57,9 +57,9 @@ def get_call_from_func_element(func):
             owner_token = djoin(*reversed(owner_token))
         else:
             owner_token = UNKOWN_VAR
-        return Call(func=func.attr, line_number=func.lineno, parent_token=owner_token)
+        return Call(func=func.attr, line_number=func.lineno, parent_token=owner_token, taken_var=)
     if type(func) == ast.Name:
-        return Call(func=func.id, line_number=func.lineno, parent_token = None)
+        return Call(func=func.id, line_number=func.lineno, parent_token = None , taken_var=)
     if type(func) in (ast.Subscript, ast.Call):
         return None
 
@@ -352,7 +352,7 @@ class Python():
         :param parent Group:
         :rtype: list[Node]
         """
-        
+
         token = tree.name
         print("FUNC TOKEN")
         print(token)

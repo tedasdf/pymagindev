@@ -128,6 +128,7 @@ class Call():
         self.func = func
         self.line_number = line_number
         self.parent_token = parent_token
+        self.taken_var = None
     
     def __repr__(self):
         return f"<Call func={self.func} line_no={self.line_number} parent_token={self.parent_token}>"

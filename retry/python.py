@@ -94,6 +94,10 @@ def process_assign(element):
             calls.extend(extract_calls(value.value))  # Extract from the subscripted element
             if hasattr(value, 'slice') and isinstance(value.slice, (ast.Name, ast.Attribute)):
                 calls.extend(extract_calls(value.slice))
+        elif isinstance(value, ast.JoinedStr):
+            for _, val in enumerate(value.values):
+                if isinstance(val, ast.FormattedValue):
+                    calls.extend(extract_calls(val.value))
         else:
             calls.append(f"{type(value).__name__}")
         return calls
@@ -108,6 +112,12 @@ def process_assign(element):
                 variables.extend(extract_targets(elt))
         elif isinstance(target, ast.Attribute):  # Handle attributes
             variables.append((target.value.id, target.attr))  # Tuple of parent and attribute
+        elif isinstance(target, ast.Subscript):
+            sub = extract_calls(target.value)  # Extract from the subscripted element
+            if hasattr(target, 'slice') and isinstance(target.slice, (ast.Name, ast.Attribute)):
+                variables.append((sub , extract_calls(target.slice),))
+            else:
+                variables.append((sub, None))
         return variables
     
     # if not isinstance(element.value, (ast.BinOp, ast.Call, ast.Attribute, ast.Subscript)):
@@ -119,7 +129,11 @@ def process_assign(element):
     #     return []
 
     ret = []
-    for target in element.targets:
+    if isinstance(element, ast.AugAssign):
+        targets = [element.target]
+    else:
+        targets = element.targets
+    for target in targets:
         # Extract all variable names from the target
         variable_names = extract_targets(target)
         for token in variable_names:
@@ -131,7 +145,7 @@ def make_operations(lines , is_root=False):
     for tree in lines:
         if is_root and check_rootnode(tree):
             return make_operations(tree.body)
-        elif type(tree) == ast.Assign:
+        elif isinstance(tree, (ast.Assign, ast.AugAssign)):
             operation.append(process_assign(tree))
         elif isinstance(tree, ast.If):  # Handle if and elif
             line_no = tree.lineno
@@ -338,12 +352,16 @@ class Python():
         :param parent Group:
         :rtype: list[Node]
         """
-
+        
         token = tree.name
         print("FUNC TOKEN")
         print(token)
         line_number = tree.lineno
         input_list , output_list = make_function_io(tree)
+        print("INPUT LIST")
+        print(input_list)
+        print("OUTPUT LIST")
+        print(output_list)
         processes = make_operations(tree.body)
         print("AFter process ")
         print_process(processes)
@@ -376,6 +394,8 @@ class Python():
         _, node_trees, body_trees , _ = Python.separate_namespaces(tree)
 
         token = tree.name
+        print("CLASS NAME")
+        print(token)
         line_number = tree.lineno
         inherits = get_inherits(tree) 
         class_group = UserDefinedClass(token,line_number, inherits)
@@ -384,7 +404,8 @@ class Python():
                 class_group.assign_attribute(make_attribute(node_tree))
             else:
                 class_group.add_function(Python.make_function(node_tree , parent=class_group))
-
+        
+        print(class_group.attribute)
         # NEXT PR NESTED CLASS
         return class_group
 

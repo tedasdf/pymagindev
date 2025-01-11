@@ -30,9 +30,42 @@ def print_process(processes, i =0):
                 print_process(pro.else_branch, i )
             print()
 
+def extract_calls(value):
+    """Recursively extract all calls, attributes, and variables."""
+    calls = []
+    if isinstance(value, ast.BinOp):  # Handle nested binary operations
+        calls.extend(extract_calls(value.left))
+        calls.extend(extract_calls(value.right))
+    elif isinstance(value, ast.Call):  # Handle function calls
+        calls.append(get_call_from_func_element(value))
+    elif isinstance(value, ast.Attribute):  # Handle attributes like `dict.keys`
+        # Extract parent and attribute
+        if isinstance(value.value, ast.Attribute):
+            parent = extract_calls(value.value) 
+        elif isinstance(value.value, ast.Call):
+            parent = get_call_from_func_element(value.value)
+        elif isinstance(value.value , ast.Dict): 
+            parent = value.value.id
+        else:
+            parent = extract_calls(value.value)
+        calls.append((parent, value.attr))  # Tuple of parent and attribute
+    elif isinstance(value, ast.Name):  # Handle simple variable names
+        calls.append(value.id)
+    elif isinstance(value, ast.Subscript):  # Handle subscripts
+        calls.extend(extract_calls(value.value))  # Extract from the subscripted element
+        if hasattr(value, 'slice') and isinstance(value.slice, (ast.Name, ast.Attribute)):
+            calls.extend(extract_calls(value.slice))
+    elif isinstance(value, ast.JoinedStr):
+        for _, val in enumerate(value.values):
+            if isinstance(val, ast.FormattedValue):
+                calls.extend(extract_calls(val.value))
+    else:
+        calls.append(f"{type(value).__name__}")
+
+    return calls
 
 
-def get_call_from_func_element(func):
+def get_call_from_func_element(value):
     """
     Given a python ast that represents a function call, clear and create our
     generic Call object. Some calls have no chance at resolution (e.g. array[2](param))
@@ -41,26 +74,45 @@ def get_call_from_func_element(func):
     :param func ast:
     :rtype: Call|None
     """
+    token_var = []
+    if hasattr(value, 'args'):
+        for arg in value.args:
+            token_var.extend(extract_calls(arg))  # Process arguments
+    if hasattr(value, 'keywords'): 
+        for keyword in value.keywords:
+            token_var.extend(extract_calls(keyword.value))
+    print(ast.dump(value, indent=4))
+    
+    func = value.func
     assert type(func) in (ast.Attribute, ast.Name, ast.Subscript, ast.Call , ast.BinOp)
     if type(func) == ast.Attribute:
+        op_example = extract_calls(func)
+
+        
         owner_token = []
         val = func.value
+
         while True:
             try:
                 owner_token.append(getattr(val, 'attr', val.id))
             except AttributeError:
                 pass
             val = getattr(val, 'value', None)
+            print(val)
             if not val:
                 break
         if owner_token:
             owner_token = djoin(*reversed(owner_token))
         else:
             owner_token = UNKOWN_VAR
-        return Call(func=func.attr, line_number=func.lineno, parent_token=owner_token, taken_var=)
+        
+
+        function =  Call(func=func.attr, line_number=func.lineno, parent_token=owner_token, taken_var=token_var)
+        return ((op_example, function)) 
     if type(func) == ast.Name:
-        return Call(func=func.id, line_number=func.lineno, parent_token = None , taken_var=)
+        return Call(func=func.id, line_number=func.lineno, parent_token = None , taken_var=token_var)
     if type(func) in (ast.Subscript, ast.Call):
+        print("FCUKED")
         return None
 
 def get_attr_from_non_func_element(attr):
@@ -74,33 +126,6 @@ def process_assign(element):
     :param element: An `Assign` node from the AST.
     :return: A list of Variable instances or an empty list if no valid assignment is found.
     """
-    def extract_calls(value):
-        """Recursively extract all calls, attributes, and variables."""
-        calls = []
-        if isinstance(value, ast.BinOp):  # Handle nested binary operations
-            calls.extend(extract_calls(value.left))
-            calls.extend(extract_calls(value.right))
-        elif isinstance(value, ast.Call):  # Handle function calls
-            calls.append(get_call_from_func_element(value.func))
-            for arg in value.args:
-                calls.extend(extract_calls(arg))  # Process arguments
-        elif isinstance(value, ast.Attribute):  # Handle attributes like `dict.keys`
-            # Extract parent and attribute
-            parent = extract_calls(value.value) if isinstance(value.value, ast.Attribute) else value.value.id
-            calls.append((parent, value.attr))  # Tuple of parent and attribute
-        elif isinstance(value, ast.Name):  # Handle simple variable names
-            calls.append(value.id)
-        elif isinstance(value, ast.Subscript):  # Handle subscripts
-            calls.extend(extract_calls(value.value))  # Extract from the subscripted element
-            if hasattr(value, 'slice') and isinstance(value.slice, (ast.Name, ast.Attribute)):
-                calls.extend(extract_calls(value.slice))
-        elif isinstance(value, ast.JoinedStr):
-            for _, val in enumerate(value.values):
-                if isinstance(val, ast.FormattedValue):
-                    calls.extend(extract_calls(val.value))
-        else:
-            calls.append(f"{type(value).__name__}")
-        return calls
 
     def extract_targets(target):
         """Recursively extract all variable names from assignment targets."""
@@ -124,7 +149,6 @@ def process_assign(element):
     #     return []  # Ignore non-call or non-operation assignments
 
     calls = extract_calls(element.value)
-
     # if not calls:  # No valid calls extracted
     #     return []
 
@@ -168,7 +192,7 @@ def make_operations(lines , is_root=False):
             operation.append(logic_inst)
         else:
             if type(tree) == ast.Expr and type(tree.value) == ast.Call:
-                call = get_call_from_func_element(tree.value.func)
+                call = get_call_from_func_element(tree.value)
                 if call:
                     operation.append(call)
     return operation # return a list of  List[Tuple( [Call | Variables | Logic Statement ] , corresponding ast tree)]

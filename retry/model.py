@@ -131,7 +131,7 @@ class Call():
         self.taken_var = taken_var
     
     def __repr__(self):
-        return f"<Call func={self.func} line_no={self.line_number} parent_token={self.parent_token}>"
+        return f"<Call func={self.func} line_no={self.line_number} parent_token={self.parent_token} taken_var={self.taken_var}>"
 
     def has_call(self):
         return True

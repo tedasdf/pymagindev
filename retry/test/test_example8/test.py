@@ -36,7 +36,7 @@ def generate_observation(
             lookup_result = self.docstore.lookup(query)
             external_tool_info["lookup_result"] = lookup_result
             obs = remove_newline(lookup_result)
-
+            
         except ValueError:
             obs = "The last page Searched was not found, so you cannot Lookup a keyword in it. Please try one of the similar pages given."
     else:

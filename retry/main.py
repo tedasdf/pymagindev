@@ -143,9 +143,7 @@ def main(sys_argv=None):
         file_group[str(source)] = make_file_group(file_ast_tree, source)
 
 
-    
-
-
+    ######################################################  
     # for file_key, file_symbol in file_group.items():
     #     file_symbol = file_symbol.all_symbols()
     #     for func in file_symbol.all_symbols():
@@ -155,12 +153,17 @@ def main(sys_argv=None):
     #                 if process.parent_token 
     #             elif isinstance(process, Variable):
     #                 comparing_token = process.points_to.func
-                    
+    ######################################################                
 
 
     for file_key, file_symbol in file_group.items():
+        print("FILE KEY")
+        print(file_key)
+        print("FILE SYMBOL")
+        print("     ",file_symbol)
         # Iterate through all functions in the current file
         for func in file_symbol.all_func():
+            print(func.token)
             for single_process in func.process:
                 process = single_process
 
@@ -174,21 +177,21 @@ def main(sys_argv=None):
                     parent = process.points_to.parent
                 else:
                     continue  # Skip if the process is neither a Call nor a Variable
+            
+        #         # Find the matching symbol for the comparing token
+        #         substitute = None
+        #         for comp in file_symbol.all_symbols():
+        #             if comp.token == comparing_token and parent == None:# Not yet have class function so this will be good for now
+        #                 substitute = comp
+        #                 break
 
-                # Find the matching symbol for the comparing token
-                substitute = None
-                for comp in file_symbol.all_symbols():
-                    if comp.token == comparing_token and parent == None:# Not yet have class function so this will be good for now
-                        substitute = comp
-                        break
-
-                # If a match is found, update the process attributes
-                if substitute:
-                    if isinstance(process, Call):
-                        process.func = substitute
-                    elif isinstance(process, Variable):
-                        process.points_to.func = substitute
-                    continue
+        #         # If a match is found, update the process attributes
+        #         if substitute:
+        #             if isinstance(process, Call):
+        #                 process.func = substitute
+        #             elif isinstance(process, Variable):
+        #                 process.points_to.func = substitute
+        #             continue
 
 
                     

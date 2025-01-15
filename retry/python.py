@@ -5,7 +5,8 @@ import os
 from model import (File, UserDefinedFunc , Call, UserDefinedClass,
                     Variable, LogicStatement)
 
-AstControlType = [ast.If , ast.Try]
+
+AstControlType = (ast.If , ast.Try, ast.While, ast.IfExp)
 
 UNKOWN_VAR = 'unknown'
 
@@ -48,6 +49,8 @@ def extract_calls(value):
             parent = value.value.id
         else:
             parent = extract_calls(value.value)
+        if type(parent) == list and len(parent) == 1:
+            [parent] = parent
         calls.append((parent, value.attr))  # Tuple of parent and attribute
     elif isinstance(value, ast.Name):  # Handle simple variable names
         calls.append(value.id)
@@ -59,6 +62,10 @@ def extract_calls(value):
         for _, val in enumerate(value.values):
             if isinstance(val, ast.FormattedValue):
                 calls.extend(extract_calls(val.value))
+    elif isinstance(value, ast.IfExp):
+        body = extract_calls(value.body)
+        orelse = extract_calls(value.orelse)
+        logic_inst = LogicStatement('if' , body , value.lineno , orelse)
     else:
         calls.append(f"{type(value).__name__}")
 
@@ -80,13 +87,10 @@ def get_call_from_func_element(value):
             token_var.extend(extract_calls(arg))  # Process arguments
     if hasattr(value, 'keywords'): 
         for keyword in value.keywords:
-            token_var.extend(extract_calls(keyword.value))
-    print(ast.dump(value, indent=4))
-    
+            token_var.extend(extract_calls(keyword.value))   
     func = value.func
     assert type(func) in (ast.Attribute, ast.Name, ast.Subscript, ast.Call , ast.BinOp)
     if type(func) == ast.Attribute:
-        op_example = extract_calls(func)
 
         
         owner_token = []
@@ -98,17 +102,19 @@ def get_call_from_func_element(value):
             except AttributeError:
                 pass
             val = getattr(val, 'value', None)
-            print(val)
             if not val:
                 break
         if owner_token:
             owner_token = djoin(*reversed(owner_token))
         else:
             owner_token = UNKOWN_VAR
-        
-
         function =  Call(func=func.attr, line_number=func.lineno, parent_token=owner_token, taken_var=token_var)
-        return ((op_example, function)) 
+        if isinstance(type(func.value),ast.Name):
+            op_example = extract_calls(func)
+            return (op_example, function)
+        else:
+            return function
+
     if type(func) == ast.Name:
         return Call(func=func.id, line_number=func.lineno, parent_token = None , taken_var=token_var)
     if type(func) in (ast.Subscript, ast.Call):
@@ -164,6 +170,7 @@ def process_assign(element):
             ret.append(Variable(token, calls, element.lineno))
     return ret
 
+
 def make_operations(lines , is_root=False):
     operation = []
     for tree in lines:
@@ -171,24 +178,17 @@ def make_operations(lines , is_root=False):
             return make_operations(tree.body)
         elif isinstance(tree, (ast.Assign, ast.AugAssign)):
             operation.append(process_assign(tree))
-        elif isinstance(tree, ast.If):  # Handle if and elif
-            line_no = tree.lineno
-            cond_type = 'if'
-            subtree = tree.body
-            process = make_operations(subtree)
-            else_branch = None
-            if len(tree.orelse) != 0:
-                else_branch = make_operations(tree.orelse)           
-            logic_inst = LogicStatement(cond_type, process, line_no , else_branch)
-            operation.append(logic_inst)
 
-        elif type(tree) == ast.Try:  # Handle try-except
+        elif isinstance(tree, AstControlType):
+            if isinstance(tree, (ast.If )) and len(tree.orelse) != 0:
+                else_branch = make_operations(tree.orelse)   
+            else:
+                else_branch = None
             line_no = tree.lineno
-            cond_type = 'try'
+            cond_type = tree.__class__.__name__.lower()
             subtree = tree.body
             process = make_operations(subtree)
-            else_branch = None
-            logic_inst = LogicStatement(cond_type, process, line_no, else_branch)
+            logic_inst = LogicStatement(cond_type, process, line_no , else_branch)
             operation.append(logic_inst)
         else:
             if type(tree) == ast.Expr and type(tree.value) == ast.Call:

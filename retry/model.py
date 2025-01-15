@@ -78,9 +78,9 @@ class UserDefinedFunc():
 
 
 class LogicStatement():
-    def __init__(self, condition_type , process, line_no, else_branch):
+    def __init__(self, condition_type ,condition ,  process, line_no, else_branch):
         self.condition_type = condition_type
-        # NEXT PR self.condition = condition # { left : Op : Right } for example if __name__ == "__main__" {__name__ : == : "__main__"}
+        self.condition = condition # { left : Op : Right } for example if __name__ == "__main__" {__name__ : == : "__main__"}
         self.process = process #  List[Tuple( [Call | Variables | Logic Statement ] , corresponding ast tree)]
         self.line_no = line_no
         # self.init_cond = init_cond NEXT PR 

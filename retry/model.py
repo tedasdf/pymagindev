@@ -59,9 +59,11 @@ class UserDefinedClass():
     def assign_attribute(self, attr):
         self.attribute = attr
     
-    def all_symbols(self):
-        #provide useable symbol within the class
-        raise NotImplementedError
+    def all_symbols_dict(self):
+        symbol_dict = {}
+        for i in self.functions:
+            symbol_dict[i.token] = i
+        return symbol_dict
 
 class UserDefinedFunc():
     """

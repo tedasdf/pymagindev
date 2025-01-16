@@ -8,6 +8,7 @@ import asyncio
 
 from python import Python
 from model import Call, File, LogicStatement, UserDefinedClass, Variable, UserDefinedFunc
+from utils import find_match
 # from db.main import CallModel, FileModel, FunctionModel, VariableModel
 
 
@@ -106,19 +107,30 @@ def make_file_group(tree, file_path):
     print("=================================================================================================")
     return file_inst
 
+UNKNOWN_FUNC = 'unknown_func'
 
-
-def check_file_reference(inst , parent , symbol):
+def check_file_reference(inst , parent , global_symbol , local_symbol):
     if isinstance(inst, Call):
         checking_token = inst.func
         parent_token = inst.parent_token
-        if parent_token == 'self':
-            checking_token = parent.token + checking_token
+        if isinstance(parent, UserDefinedClass) and parent_token == 'self':
+            key = find_match(checking_token, list(local_symbol.keys()))
+            if key:
+                inst.func = global_symbol[key]
+            else:
+                inst.func = UNKNOWN_FUNC
+            return
         elif parent != None:
+            ### TODO
+            # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
             checking_token = parent_token + checking_token
-
-        if checking_token = 
-            
+        else: # this is for pure function inside a file not in class 
+            key = find_match(checking_token, list(global_symbol.keys()))
+            if key:
+                inst.func = global_symbol[key]
+            else:
+                inst.func = UNKNOWN_FUNC
+    return
 
             # if the function is a symbol wihtin the file , it will be referecne to the corresponding symbol
             # if the function is a symbol within the class, it will also be refenced 
@@ -182,12 +194,14 @@ def main(sys_argv=None):
         print(file_key)
         print("FILE SYMBOL")
         print("     ",file_symbol)
+        global_symbol = file_symbol.all_symbols_dict()
         # Iterate through all functions in the current file
         # for func in file_symbol.all_func():
         #     print(func.token)
         #     for single_process in func.process:
         #         process = single_process
         for cla in file_symbol.all_classes():
+                local_symbol = cla.all_symbols_dict()
                 print(cla.token)
                 for func in cla.functions:
                     print("FUNCTION NAME")
@@ -196,20 +210,10 @@ def main(sys_argv=None):
                     print(func.process)
                     for process in func.process:
                         # Extract the comparing token based on the type of `process`
-                        parent = None
                         print("THIS PROCESS")
                         print(process)
                         if isinstance(process, Call):
-                            comparing_token = process.func
-                            parent = process.parent_token
-                            # Find the matching symbol for the comparing token
-                            substitute = None
-                            for comp in file_symbol.all_symbols():
-                                if comp.token == comparing_token and parent == None:# Not yet have class function so this will be good for now
-                                    process.func = comp
-                                    print("THis is a CALL")
-                                    print(type(process.func))   
-                                    break
+                            check_file_reference(process, cla, global_symbol , local_symbol)
                         elif isinstance(process, Variable):
                             comparing_tokens = process.points_to
                             parent = process.points_to.parent

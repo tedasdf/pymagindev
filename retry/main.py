@@ -106,6 +106,28 @@ def make_file_group(tree, file_path):
     print("=================================================================================================")
     return file_inst
 
+
+
+def check_file_reference(inst , parent , symbol):
+    if isinstance(inst, Call):
+        checking_token = inst.func
+        parent_token = inst.parent_token
+        if parent_token == 'self':
+            checking_token = parent.token + checking_token
+        elif parent != None:
+            checking_token = parent_token + checking_token
+
+        if checking_token = 
+            
+
+            # if the function is a symbol wihtin the file , it will be referecne to the corresponding symbol
+            # if the function is a symbol within the class, it will also be refenced 
+            # if the function is a function from some other library:
+                # if the function has no variable inpit , it is regarded as a constant 
+                # ifthe function is a function with variable input  it is consider as f(variable 1, variable2, varaible3 , .....)
+
+
+
 def main(sys_argv=None):
     """
     CLI interface. Sys_argv is a parameter for the sake of unittest coverage.
@@ -137,7 +159,6 @@ def main(sys_argv=None):
         except Exception as ex:
             raise ex
 
-    # NEXT PR Folder group
     file_group = {}
     for source, file_ast_tree in file_ast_trees:
         file_group[str(source)] = make_file_group(file_ast_tree, source)
@@ -162,59 +183,76 @@ def main(sys_argv=None):
         print("FILE SYMBOL")
         print("     ",file_symbol)
         # Iterate through all functions in the current file
-        for func in file_symbol.all_func():
-            print(func.token)
-            for single_process in func.process:
-                process = single_process
+        # for func in file_symbol.all_func():
+        #     print(func.token)
+        #     for single_process in func.process:
+        #         process = single_process
+        for cla in file_symbol.all_classes():
+                print(cla.token)
+                for func in cla.functions:
+                    print("FUNCTION NAME")
+                    print(func)
+                    process_list = []
+                    print(func.process)
+                    for process in func.process:
+                        # Extract the comparing token based on the type of `process`
+                        parent = None
+                        print("THIS PROCESS")
+                        print(process)
+                        if isinstance(process, Call):
+                            comparing_token = process.func
+                            parent = process.parent_token
+                            # Find the matching symbol for the comparing token
+                            substitute = None
+                            for comp in file_symbol.all_symbols():
+                                if comp.token == comparing_token and parent == None:# Not yet have class function so this will be good for now
+                                    process.func = comp
+                                    print("THis is a CALL")
+                                    print(type(process.func))   
+                                    break
+                        elif isinstance(process, Variable):
+                            comparing_tokens = process.points_to
+                            parent = process.points_to.parent
+                        else:
+                            continue  # Skip if the process is neither a Call nor a Variable
 
-                # Extract the comparing token based on the type of `process`
-                parent = None
-                if isinstance(process, Call):
-                    comparing_token = process.func
-                    parent = process.parent_token
-                elif isinstance(process, Variable):
-                    comparing_token = process.points_to.func
-                    parent = process.points_to.parent
-                else:
-                    continue  # Skip if the process is neither a Call nor a Variable
-            
-        #         # Find the matching symbol for the comparing token
-        #         substitute = None
-        #         for comp in file_symbol.all_symbols():
-        #             if comp.token == comparing_token and parent == None:# Not yet have class function so this will be good for now
-        #                 substitute = comp
-        #                 break
 
-        #         # If a match is found, update the process attributes
-        #         if substitute:
-        #             if isinstance(process, Call):
-        #                 process.func = substitute
-        #             elif isinstance(process, Variable):
-        #                 process.points_to.func = substitute
-        #             continue
+                #        
+                
+                        # If a match is found, update the process attributes
+                        if substitute:
+                            if isinstance(process, Call):
+                                process.func = substitute
+                                print("THis is a CALL")
+                                print(type(process.func))
+                            elif isinstance(process, Variable):
+                                process.points_to.func = substitute
+                                print("THIS is a Variable")
+                                print(type(process.points_to.func))
+                            continue
 
-
+                    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                     
-    for file_key, file_symbol in file_group.items():
-        # file_model = FileModel( token=file_symbol.token ,
-        #                         path=file_key)
-        for func in file_symbol.all_func():
-            # function_model = FunctionModel( token=func.token,
-            #                                 parent=file_model)
-            # print(func.token)
-            output= []
-            for process in func.process:
-                if isinstance(process, Call) and isinstance(process.func, UserDefinedFunc):
-                        output.append(process)
-                elif isinstance(process, Variable) and isinstance(process.points_to.func, (UserDefinedClass, UserDefinedFunc)):
-                    output.append(process)
-            # print()
-            # print(output)
-            # print()
-            # print("==================================================")
-            # print()
-            # print()
-            func.output = output
+    # for file_key, file_symbol in file_group.items():
+    #     # file_model = FileModel( token=file_symbol.token ,
+    #     #                         path=file_key)
+    #     for func in file_symbol.all_func():
+    #         # function_model = FunctionModel( token=func.token,
+    #         #                                 parent=file_model)
+    #         # print(func.token)
+    #         output= []
+    #         for process in func.process:
+    #             if isinstance(process, Call) and isinstance(process.func, UserDefinedFunc):
+    #                     output.append(process)
+    #             elif isinstance(process, Variable) and isinstance(process.points_to.func, (UserDefinedClass, UserDefinedFunc)):
+    #                 output.append(process)
+    #         # print()
+    #         # print(output)
+    #         # print()
+    #         # print("==================================================")
+    #         # print()
+    #         # print()
+    #         func.output = output
 
 
     # file_model = None

@@ -25,11 +25,12 @@ def print_process(processes, i =0):
         print(pro)
         if isinstance(pro, LogicStatement):
             print(pro.condition_type , i)
+            print(pro.condition)
             print_process(pro.process, i )
             if pro.else_branch:
                 print("ELSE:", i)
                 print_process(pro.else_branch, i )
-            print()
+        print()
 
 def extract_calls(value):
     """Recursively extract all calls, attributes, and variables."""
@@ -37,6 +38,8 @@ def extract_calls(value):
     if isinstance(value, ast.BinOp):  # Handle nested binary operations
         calls.extend(extract_calls(value.left))
         calls.extend(extract_calls(value.right))
+    elif isinstance(value, ast.UnaryOp):
+        calls.extend(extract_calls(value.operand))
     elif isinstance(value, ast.Call):  # Handle function calls
         calls.append(get_call_from_func_element(value))
     elif isinstance(value, ast.Attribute):  # Handle attributes like `dict.keys`
@@ -65,7 +68,9 @@ def extract_calls(value):
     elif isinstance(value, ast.IfExp):
         body = extract_calls(value.body)
         orelse = extract_calls(value.orelse)
-        logic_inst = LogicStatement('if' , body , value.lineno , orelse)
+        test = extract_calls(value.test)
+        logic_inst = LogicStatement('ifExp' , test , body , value.lineno , orelse)
+        calls.append(logic_inst)
     else:
         calls.append(f"{type(value).__name__}")
 
@@ -177,7 +182,7 @@ def make_operations(lines , is_root=False):
         if is_root and check_rootnode(tree):
             return make_operations(tree.body)
         elif isinstance(tree, (ast.Assign, ast.AugAssign)):
-            operation.append(process_assign(tree))
+            operation.extend(process_assign(tree))
 
         elif isinstance(tree, AstControlType):
             if isinstance(tree, (ast.If )) and len(tree.orelse) != 0:
@@ -188,7 +193,8 @@ def make_operations(lines , is_root=False):
             cond_type = tree.__class__.__name__.lower()
             subtree = tree.body
             process = make_operations(subtree)
-            logic_inst = LogicStatement(cond_type, process, line_no , else_branch)
+            test = extract_calls(tree.test)
+            logic_inst = LogicStatement(cond_type,test, process, line_no , else_branch)
             operation.append(logic_inst)
         else:
             if type(tree) == ast.Expr and type(tree.value) == ast.Call:
@@ -378,18 +384,12 @@ class Python():
         """
 
         token = tree.name
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         print("FUNC TOKEN")
         print(token)
         line_number = tree.lineno
         input_list , output_list = make_function_io(tree)
-        print("INPUT LIST")
-        print(input_list)
-        print("OUTPUT LIST")
-        print(output_list)
         processes = make_operations(tree.body)
-        print("AFter process ")
-        print_process(processes)
-        print("After print")
         docstring = ast.get_docstring(tree)
 
         
@@ -429,7 +429,6 @@ class Python():
             else:
                 class_group.add_function(Python.make_function(node_tree , parent=class_group))
         
-        print(class_group.attribute)
         # NEXT PR NESTED CLASS
         return class_group
 

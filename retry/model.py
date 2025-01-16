@@ -30,6 +30,14 @@ class File():
     def all_symbols(self):
         symbol_list = self.func_list + self.classes_list
         return symbol_list
+    
+    def all_symbols_dict(self):
+        symbol_dict = {}
+        for i in self.func_list:
+            symbol_dict[i.token] = i
+        for i in self.classes_list:
+            symbol_dict[i.token] = i
+        return symbol_dict
 
 class UserDefinedClass():
     """
@@ -154,7 +162,7 @@ class Variable():
         self.line_number = line_number
 
     def __repr__(self):
-        return f"Variable token={self.token} point_to={self.points_to} line_no={self.line_number}"
+        return f"<Variable token={self.token} point_to={self.points_to}>"
 
     def has_call(self):
         raise isinstance(self.points_to, Call)

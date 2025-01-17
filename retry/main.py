@@ -109,28 +109,40 @@ def make_file_group(tree, file_path):
 
 UNKNOWN_FUNC = 'unknown_func'
 
-def check_file_reference(inst , parent , global_symbol , local_symbol):
-    if isinstance(inst, Call):
+def check_file_reference(instes , parent , global_symbol , local_symbol):
+    
+    for inst in  instes:
+        if not isinstance(inst, Call):
+            continue
         checking_token = inst.func
         parent_token = inst.parent_token
+        print(inst)
+        print(checking_token)
         if isinstance(parent, UserDefinedClass) and parent_token == 'self':
-            key = find_match(checking_token, list(local_symbol.keys()))
+            # If it's a method call inside a class (via 'self')
+            key = find_match(list(local_symbol.keys()),checking_token)
             if key:
-                inst.func = global_symbol[key]
+                print(local_symbol[key])
             else:
-                inst.func = UNKNOWN_FUNC
-            return
-        elif parent != None:
+                print(UNKNOWN_FUNC)
+        elif isinstance(parent, UserDefinedClass) and parent_token != 'self':
+            # If it's a method call via an instance (like 'a.test()')
+            # You need to get the class name of the instance `a` and combine it with the method name
+            key = find_match(list(global_symbol.keys()),checking_token)
+            if key:
+                print(global_symbol[key])
+            else:
+                print(UNKNOWN_FUNC)
+        elif parent_token != None:
             ### TODO
             # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
             checking_token = parent_token + checking_token
         else: # this is for pure function inside a file not in class 
-            key = find_match(checking_token, list(global_symbol.keys()))
+            key = find_match(list(global_symbol.keys()),checking_token)
             if key:
-                inst.func = global_symbol[key]
+                print(global_symbol[key])
             else:
-                inst.func = UNKNOWN_FUNC
-    return
+                print(UNKNOWN_FUNC)
 
             # if the function is a symbol wihtin the file , it will be referecne to the corresponding symbol
             # if the function is a symbol within the class, it will also be refenced 
@@ -139,6 +151,21 @@ def check_file_reference(inst , parent , global_symbol , local_symbol):
                 # ifthe function is a function with variable input  it is consider as f(variable 1, variable2, varaible3 , .....)
 
 
+def check_process(processes, parent, local_symbol , global_symbol):
+    for pro in processes:
+        if isinstance(pro, Call):
+            check_file_reference([pro] , parent, global_symbol , local_symbol)
+        elif isinstance(pro, Variable):
+            check_file_reference(pro.points_to , parent, global_symbol , local_symbol)
+        if isinstance(pro, LogicStatement):
+            print(pro.condition_type)
+            print(pro.condition)
+            check_process(pro.process, parent, local_symbol , global_symbol )
+            if pro.else_branch:
+                print()
+                check_process(pro.else_branch, parent, local_symbol , global_symbol )
+
+        print()
 
 def main(sys_argv=None):
     """
@@ -176,6 +203,17 @@ def main(sys_argv=None):
         file_group[str(source)] = make_file_group(file_ast_tree, source)
 
 
+    print('Start Function and file referencing')
+    for file_key , file_inst in file_group.items():
+        classes_int = file_inst.classes_list
+        file_symbol_dict = file_inst.all_symbols_dict()
+        for class_inst in classes_int:
+            class_symbol = class_inst.all_symbols_dict()
+            for func in class_inst.functions:
+                check_process(func.process, class_inst,class_symbol , file_symbol_dict )
+
+        
+
     ######################################################  
     # for file_key, file_symbol in file_group.items():
     #     file_symbol = file_symbol.all_symbols()
@@ -189,54 +227,6 @@ def main(sys_argv=None):
     ######################################################                
 
 
-    for file_key, file_symbol in file_group.items():
-        print("FILE KEY")
-        print(file_key)
-        print("FILE SYMBOL")
-        print("     ",file_symbol)
-        global_symbol = file_symbol.all_symbols_dict()
-        # Iterate through all functions in the current file
-        # for func in file_symbol.all_func():
-        #     print(func.token)
-        #     for single_process in func.process:
-        #         process = single_process
-        for cla in file_symbol.all_classes():
-                local_symbol = cla.all_symbols_dict()
-                print(cla.token)
-                for func in cla.functions:
-                    print("FUNCTION NAME")
-                    print(func)
-                    process_list = []
-                    print(func.process)
-                    for process in func.process:
-                        # Extract the comparing token based on the type of `process`
-                        print("THIS PROCESS")
-                        print(process)
-                        if isinstance(process, Call):
-                            check_file_reference(process, cla, global_symbol , local_symbol)
-                        elif isinstance(process, Variable):
-                            comparing_tokens = process.points_to
-                            parent = process.points_to.parent
-                        else:
-                            continue  # Skip if the process is neither a Call nor a Variable
-
-
-                #        
-                
-                        # If a match is found, update the process attributes
-                        if substitute:
-                            if isinstance(process, Call):
-                                process.func = substitute
-                                print("THis is a CALL")
-                                print(type(process.func))
-                            elif isinstance(process, Variable):
-                                process.points_to.func = substitute
-                                print("THIS is a Variable")
-                                print(type(process.points_to.func))
-                            continue
-
-                    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-                    
     # for file_key, file_symbol in file_group.items():
     #     # file_model = FileModel( token=file_symbol.token ,
     #     #                         path=file_key)

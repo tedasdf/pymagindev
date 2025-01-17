@@ -15,7 +15,7 @@ class VariableModel(BaseModel):
 
 class LogicStatModel(BaseModel):
     cond_type: str
-    condition: Optional[str] = []
+    condition: Optional[List[Union[CallModel, str]]] = []
     process: List[Union[CallModel, VariableModel, str]]  # Can contain Call, Variable, or str
 
 

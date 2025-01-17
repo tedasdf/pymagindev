@@ -193,7 +193,9 @@ def make_operations(lines , is_root=False):
             cond_type = tree.__class__.__name__.lower()
             subtree = tree.body
             process = make_operations(subtree)
-            test = extract_calls(tree.test)
+            test = None
+            if not isinstance(tree, ast.Try):
+                test = extract_calls(tree.test)
             logic_inst = LogicStatement(cond_type,test, process, line_no , else_branch)
             operation.append(logic_inst)
         else:
@@ -392,7 +394,7 @@ class Python():
         processes = make_operations(tree.body)
         docstring = ast.get_docstring(tree)
 
-        
+        print_process(processes)
         # print("PROCESS START ")
         # for pro in processes:
         #     if isinstance(pro, LogicStatement):

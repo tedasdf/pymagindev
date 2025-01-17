@@ -443,16 +443,18 @@ class Python():
     @staticmethod
     def make_import(trees):
         import_list = []
-    
         for import_tree in trees:
             if isinstance(import_tree, ast.ImportFrom):
                 # only importing from the same repo matters so no need to have import 
                 # first filter
-                for alias in import_tree.names:
-                    import_list.append({
-                        'from': import_tree.module, 
-                        'function': alias.name, 
-                        'as': alias.asname
-                    })
-        
+                from_inst = import_tree.module
+            else:
+                from_inst = None
+            for alias in import_tree.names:
+                import_list.append({
+                    'from': from_inst, 
+                    'import': alias.name, 
+                    'as': alias.asname
+                })
+        print(import_list)
         return import_list

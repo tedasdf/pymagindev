@@ -91,7 +91,9 @@ def make_file_group(tree, file_path):
     print("FILE_TOKEN:")
     print(file_inst.file_path)
 
-    file_inst.import_list = language.make_import(import_trees)
+    file_inst.imported_list = language.make_import(import_trees)
+    print("IMPORT BACK CHECK")
+    print(file_inst.imported_list)
     # NEXT PR implement nested functino
     for node_tree in node_trees:
         file_inst.add_func_list(language.make_function(node_tree, parent=file_inst))
@@ -159,7 +161,7 @@ def check_process(processes, parent, local_symbol , global_symbol):
             check_file_reference(pro.points_to , parent, global_symbol , local_symbol)
         if isinstance(pro, LogicStatement):
             print(pro.condition_type)
-            print(pro.condition)
+            check_process(pro.condition, parent, local_symbol , global_symbol )
             check_process(pro.process, parent, local_symbol , global_symbol )
             if pro.else_branch:
                 print()
@@ -204,9 +206,16 @@ def main(sys_argv=None):
 
 
     print('Start Function and file referencing')
+    # only in class function referencing 
     for file_key , file_inst in file_group.items():
+        print(file_key)
         classes_int = file_inst.classes_list
+        # in file symbol 
         file_symbol_dict = file_inst.all_symbols_dict()
+        print("IMPORT LIST ")
+        print(file_inst.imported_list)
+        # out of file import symbol
+
         for class_inst in classes_int:
             class_symbol = class_inst.all_symbols_dict()
             for func in class_inst.functions:

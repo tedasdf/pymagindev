@@ -8,7 +8,7 @@ import tiktoken
 
 from tiktoken.core import Encoding
 
-from agential.agents.react.functional import (
+from functional import (
     _is_halted,
     _prompt_agent,
     accumulate_metrics,

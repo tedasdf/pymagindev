@@ -168,12 +168,14 @@ def process_assign(element):
         targets = [element.target]
     else:
         targets = element.targets
+    
+
+    variable_names = []
     for target in targets:
         # Extract all variable names from the target
-        variable_names = extract_targets(target)
-        for token in variable_names:
-            ret.append(Variable(token, calls, element.lineno))
-    return ret
+        variable_names.extend(extract_targets(target))
+  
+    return Variable(variable_names, calls, element.lineno)
 
 
 def make_operations(lines , is_root=False):
@@ -182,7 +184,7 @@ def make_operations(lines , is_root=False):
         if is_root and check_rootnode(tree):
             return make_operations(tree.body)
         elif isinstance(tree, (ast.Assign, ast.AugAssign)):
-            operation.extend(process_assign(tree))
+            operation.append(process_assign(tree))
 
         elif isinstance(tree, AstControlType):
             if isinstance(tree, (ast.If )) and len(tree.orelse) != 0:

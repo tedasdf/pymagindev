@@ -102,13 +102,14 @@ def make_file_group(tree, file_path, raw_source_paths):
             for raw_source in raw_source_paths:
                 for key in check:
                     print("the fucking source is raw",raw_source)
-                    if language.is_module_in_repo(key,raw_source):
+                    if language.resolve_import_path(key,raw_source):
                         print(key)
                         print("IS IN REPO")
                         print(raw_source)
+                    
                     else:
                         print(key, "not in the REPO", raw_source)
-            
+                    print()
 
 
 

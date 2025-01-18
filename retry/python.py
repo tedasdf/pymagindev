@@ -443,25 +443,38 @@ class Python():
         return make_operations(tree, True), make_constant(tree)
 
     @staticmethod
-    def is_module_in_repo(module_name, repo_path):
-        # Construct the name of the file to look for
+    def resolve_import_path(import_path, base_dir):
+        """
+        Resolves an import path by iterating over the path parts and checking for valid directories.
+        If the path is not found, starts from the base directory and appends until a valid directory is found.
+        """
+        if import_path == None:
+            return False
+        # Split the import into its parts
+        path_parts = import_path.split('.')
         
-        # Walk through the repo directory structure
-        for root, dirs, files in os.walk(repo_path):
-            # print(dirs)
-            if f"{module_name}.py" in files:
-                # If the module file is found, return True
-                module_abs_path = os.path.abspath(os.path.join(root, f"{module_name}.py"))
-                # print(f"Module '{module_name}' found at: {module_abs_path}")
-                return True
-            if module_name in dirs:
-                module_abs_path = os.path.abspath(os.path.join(root, module_name))
-                # print(f"Module '{module_name}' found at: {module_abs_path}")
-                return True
+        # Start from the base directory (repo root)
+        current_path = base_dir
+        print("Base directory:", current_path)
+        
+        # Try to resolve the path progressively
+        partial_path = '.\\'
+        for i in path_parts:
+            partial_path = os.path.join(partial_path ,i)
+            print(partial_path)
+            if partial_path in current_path or partial_path == current_path:
+                continue
+            elif current_path in partial_path:
+                print(partial_path)
+                if os.path.isdir(partial_path):
+                    continue
+                else:
+                    return False
+            else:
+                partial_path = os.path.join(current_path,partial_path)
 
-        # If the module is not found, return False
-        # print(f"Module '{module_name}' is NOT found in the repo.")
-        return False
+        return True
+
 
     
     @staticmethod

@@ -444,29 +444,25 @@ class Python():
 
     @staticmethod
     def is_module_in_repo(module_name, repo_path):
-        try:
-            # Import the module
-            module = importlib.import_module(module_name)
-            
-            # Get the file path of the module
-            module_path = getattr(module, '__file__', None)
-            
-            if module_path:
-                # Get the absolute path of the module
-                module_abs_path = os.path.abspath(module_path)
-                
-                # Check if the module's directory is within the repo path
-                repo_abs_path = os.path.abspath(repo_path)
-                
-                # Return True if the module is within the repo directory
-                return module_abs_path.startswith(repo_abs_path)
-            
-            else:
-                # If the module has no __file__ attribute, it's probably a built-in or C-extension module
-                return False
-        except ModuleNotFoundError:
-            print(f"Module '{module_name}' not found.")
-            return False
+        # Construct the name of the file to look for
+        
+        # Walk through the repo directory structure
+        for root, dirs, files in os.walk(repo_path):
+            # print(dirs)
+            if f"{module_name}.py" in files:
+                # If the module file is found, return True
+                module_abs_path = os.path.abspath(os.path.join(root, f"{module_name}.py"))
+                # print(f"Module '{module_name}' found at: {module_abs_path}")
+                return True
+            if module_name in dirs:
+                module_abs_path = os.path.abspath(os.path.join(root, module_name))
+                # print(f"Module '{module_name}' found at: {module_abs_path}")
+                return True
+
+        # If the module is not found, return False
+        # print(f"Module '{module_name}' is NOT found in the repo.")
+        return False
+
     
     @staticmethod
     def make_import(trees):

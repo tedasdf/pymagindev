@@ -106,6 +106,8 @@ def make_file_group(tree, file_path, raw_source_paths):
                         print(key)
                         print("IS IN REPO")
                         print(raw_source)
+                    else:
+                        print(key, "not in the REPO", raw_source)
             
 
 

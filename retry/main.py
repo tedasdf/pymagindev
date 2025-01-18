@@ -69,7 +69,7 @@ def get_sources_and_language(raw_source_paths):
     sources = sorted(list(sources))
     return sources
 
-def make_file_group(tree, file_path):
+def make_file_group(tree, file_path, raw_source_paths):
     """
     Given an AST for the entire file, generate a file group complete with
     subgroups, nodes, etc.
@@ -92,8 +92,24 @@ def make_file_group(tree, file_path):
     print(file_inst.file_path)
 
     file_inst.imported_list = language.make_import(import_trees)
-    print("IMPORT BACK CHECK")
+
     print(file_inst.imported_list)
+    for import_inst in file_inst.imported_list :
+            if isinstance(import_inst, dict):
+                check = import_inst.keys()
+            else:
+                check = [import_inst]
+            for raw_source in raw_source_paths:
+                for key in check:
+                    print("the fucking source is raw",raw_source)
+                    if language.is_module_in_repo(key,raw_source):
+                        print(key)
+                        print("IS IN REPO")
+                        print(raw_source)
+            
+
+
+
     # NEXT PR implement nested functino
     for node_tree in node_trees:
         file_inst.add_func_list(language.make_function(node_tree, parent=file_inst))
@@ -111,9 +127,13 @@ def make_file_group(tree, file_path):
 
 UNKNOWN_FUNC = 'unknown_func'
 
+
+
+
 def check_file_reference(instes , parent , global_symbol , local_symbol):
     
     for inst in  instes:
+        print("FOR LOOPING INSTS")
         if not isinstance(inst, Call):
             continue
         checking_token = inst.func
@@ -124,17 +144,19 @@ def check_file_reference(instes , parent , global_symbol , local_symbol):
             # If it's a method call inside a class (via 'self')
             key = find_match(list(local_symbol.keys()),checking_token)
             if key:
-                print(local_symbol[key])
+                inst.func = local_symbol[key]
             else:
-                print(UNKNOWN_FUNC)
+                inst.func = UNKNOWN_FUNC
+                print("Self and not in class need to check inherit")
         elif isinstance(parent, UserDefinedClass) and parent_token != 'self':
             # If it's a method call via an instance (like 'a.test()')
             # You need to get the class name of the instance `a` and combine it with the method name
             key = find_match(list(global_symbol.keys()),checking_token)
             if key:
-                print(global_symbol[key])
+                inst.func = global_symbol[key]
             else:
-                print(UNKNOWN_FUNC)
+                inst.func = UNKNOWN_FUNC
+                # highly likely so that it is not 
         elif parent_token != None:
             ### TODO
             # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
@@ -142,9 +164,9 @@ def check_file_reference(instes , parent , global_symbol , local_symbol):
         else: # this is for pure function inside a file not in class 
             key = find_match(list(global_symbol.keys()),checking_token)
             if key:
-                print(global_symbol[key])
+                inst.func = global_symbol[key]
             else:
-                print(UNKNOWN_FUNC)
+                inst.func = UNKNOWN_FUNC
 
             # if the function is a symbol wihtin the file , it will be referecne to the corresponding symbol
             # if the function is a symbol within the class, it will also be refenced 
@@ -156,8 +178,10 @@ def check_file_reference(instes , parent , global_symbol , local_symbol):
 def check_process(processes, parent, local_symbol , global_symbol):
     for pro in processes:
         if isinstance(pro, Call):
+            print("THIS IS CALL")
             check_file_reference([pro] , parent, global_symbol , local_symbol)
         elif isinstance(pro, Variable):
+            print("THIS IS VARIABLE")
             check_file_reference(pro.points_to , parent, global_symbol , local_symbol)
         if isinstance(pro, LogicStatement):
             print(pro.condition_type)
@@ -202,7 +226,7 @@ def main(sys_argv=None):
 
     file_group = {}
     for source, file_ast_tree in file_ast_trees:
-        file_group[str(source)] = make_file_group(file_ast_tree, source)
+        file_group[str(source)] = make_file_group(file_ast_tree, source,raw_source_paths)
 
 
     print('Start Function and file referencing')

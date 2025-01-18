@@ -1,6 +1,8 @@
 import ast
 import logging
 import os
+import sys
+import importlib
 
 from model import (File, UserDefinedFunc , Call, UserDefinedClass,
                     Variable, LogicStatement)
@@ -396,7 +398,7 @@ class Python():
         processes = make_operations(tree.body)
         docstring = ast.get_docstring(tree)
 
-        print_process(processes)
+        # print_process(processes)
         # print("PROCESS START ")
         # for pro in processes:
         #     if isinstance(pro, LogicStatement):
@@ -440,6 +442,32 @@ class Python():
     def make_root_node(tree):
         return make_operations(tree, True), make_constant(tree)
 
+    @staticmethod
+    def is_module_in_repo(module_name, repo_path):
+        try:
+            # Import the module
+            module = importlib.import_module(module_name)
+            
+            # Get the file path of the module
+            module_path = getattr(module, '__file__', None)
+            
+            if module_path:
+                # Get the absolute path of the module
+                module_abs_path = os.path.abspath(module_path)
+                
+                # Check if the module's directory is within the repo path
+                repo_abs_path = os.path.abspath(repo_path)
+                
+                # Return True if the module is within the repo directory
+                return module_abs_path.startswith(repo_abs_path)
+            
+            else:
+                # If the module has no __file__ attribute, it's probably a built-in or C-extension module
+                return False
+        except ModuleNotFoundError:
+            print(f"Module '{module_name}' not found.")
+            return False
+    
     @staticmethod
     def make_import(trees):
         import_list = []

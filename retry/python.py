@@ -12,6 +12,29 @@ AstControlType = (ast.If , ast.Try, ast.While, ast.IfExp)
 
 UNKOWN_VAR = 'unknown'
 
+
+def get_relative_path(file_path, level):
+    """
+    Removes the path parts relative to the given level and returns the new path.
+    
+    :param file_path: The original file path
+    :param level: The number of levels to go up (remove that many parts from the path)
+    :return: The new relative path
+    """
+    # Normalize the path (to handle things like . or ..)
+    file_path = os.path.normpath(file_path)
+    
+    # Split the path into parts
+    path_parts = file_path.split(os.sep)
+    
+    # Remove the number of parts specified by the level
+    if level > 0:
+        path_parts = path_parts[:-level]
+
+    return '.'.join(path_parts)
+
+
+
 def djoin(*tup):
     """
     Convenience method to join strings with dots
@@ -442,6 +465,14 @@ class Python():
     def make_root_node(tree):
         return make_operations(tree, True), make_constant(tree)
 
+
+
+    @staticmethod
+    def new_resolve_import(import_inst, base_dir):
+        if type(import_inst) == dict:
+            print("")
+        raise NotImplementedError
+    
     @staticmethod
     def resolve_import_path(import_path, base_dir):
         """
@@ -472,19 +503,27 @@ class Python():
                     return False
             else:
                 partial_path = os.path.join(current_path,partial_path)
-
+        
         return True
 
 
     
     @staticmethod
-    def make_import(trees):
+    def make_import(trees, file_path):
         import_list = []
 
         for import_tree in trees:
             if isinstance(import_tree, ast.ImportFrom):
                 # Handle 'from ... import ...' imports
+                print("AST TREE")
+                print(ast.dump(import_tree , indent=4))
                 from_inst = import_tree.module
+                level = import_tree.level
+                if level != 0:
+                    if from_inst == None:
+                        from_inst = ''
+                    from_inst = '.'.join([from_inst ,get_relative_path(file_path, level)])
+                print(from_inst)
                 names_list = [
                     (alias.name, alias.asname) if alias.asname else alias.name
                     for alias in import_tree.names

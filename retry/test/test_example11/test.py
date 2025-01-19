@@ -11,3 +11,7 @@ from test.test_example11.nonexistent import some_module
 # from test.test_example10.subdir1.functional import some_function
 
 print("Test imports")
+
+
+def print_hello():
+    print("HELLO")

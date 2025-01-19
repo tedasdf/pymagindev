@@ -91,9 +91,19 @@ def make_file_group(tree, file_path, raw_source_paths):
     print("FILE_TOKEN:")
     print(file_inst.file_path)
 
-    file_inst.imported_list = language.make_import(import_trees)
+    file_inst.imported_list = language.make_import(import_trees, file_inst.file_path)
 
     print(file_inst.imported_list)
+    for import_inst in file_inst.imported_list:
+        print(import_inst)
+        if language.new_resolve_import(import_inst, raw_source):
+            print(key)
+            print("IS IN REPO")
+            print(raw_source)
+        
+        else:
+            print(key, "not in the REPO", raw_source)
+        print()
     for import_inst in file_inst.imported_list :
             if isinstance(import_inst, dict):
                 check = import_inst.keys()

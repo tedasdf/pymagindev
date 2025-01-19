@@ -518,11 +518,10 @@ class Python():
         partial_path = '.\\'
         for i in path_parts:
             partial_path = os.path.join(partial_path ,i)
-            print(partial_path)
             if partial_path in current_path or partial_path == current_path:
                 continue
             elif current_path in partial_path:
-                print(partial_path)
+                print("Before cjheck", partial_path)
                 if os.path.isdir(partial_path):
                     continue
                 else:
@@ -535,27 +534,29 @@ class Python():
 
     
     @staticmethod
-    def make_import(trees, file_path):
+    def make_import(trees, file_path, raw_source_path):
         import_list = []
 
         for import_tree in trees:
             if isinstance(import_tree, ast.ImportFrom):
                 # Handle 'from ... import ...' imports
-                print("AST TREE")
-                print(ast.dump(import_tree , indent=4))
+                # print("AST TREE")
+                # print(ast.dump(import_tree , indent=4))
                 from_inst = import_tree.module
                 level = import_tree.level
                 if level != 0:
                     if from_inst == None:
                         from_inst = ''
-                    from_inst = '.'.join([from_inst ,get_relative_path(file_path, level)])
+                    from_inst = '.'.join([get_relative_path(file_path, level), from_inst])
                 print(from_inst)
                 names_list = [
                     (alias.name, alias.asname) if alias.asname else alias.name
                     for alias in import_tree.names
                 ]
                 # Append the import directly
-                import_list.append({from_inst: names_list})
+
+                if Python.resolve_import_path(from_inst , raw_source_path): # only path check , not detailed enough
+                    import_list.append({from_inst: names_list})
             
             elif isinstance(import_tree, ast.Import):
                 # Handle 'import ...' imports
@@ -564,6 +565,7 @@ class Python():
                     for alias in import_tree.names
                 ]
                 # Append the import directly
-                import_list.extend(names_list)
+                if Python.resolve_import_path(from_inst , raw_source_path): # only path check , not detailed enough
+                    import_list.extend(names_list)
         
         return import_list

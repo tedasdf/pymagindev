@@ -31,12 +31,16 @@ class File():
         symbol_list = self.func_list + self.classes_list
         return symbol_list
     
-    def all_symbols_dict(self):
+    def symbols_dict(self , symbol= None):
+        # if type is all  then all
+
         symbol_dict = {}
         for i in self.func_list:
-            symbol_dict[i.token] = i
+            if symbol == None or i.token in symbol:
+                symbol_dict[i.token] = i
         for i in self.classes_list:
-            symbol_dict[i.token] = i
+            if symbol == None or i.token in symbol:
+                symbol_dict[i.token] = i
         return symbol_dict
 
 class UserDefinedClass():

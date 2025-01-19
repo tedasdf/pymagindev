@@ -90,38 +90,19 @@ def make_file_group(tree, file_path, raw_source_paths):
     print("=================================================================================================")
     print("FILE_TOKEN:")
     print(file_inst.file_path)
+    [raw_source_path] = raw_source_paths
+    file_inst.imported_list = language.make_import(import_trees, file_inst.file_path, raw_source_path)
 
-    file_inst.imported_list = language.make_import(import_trees, file_inst.file_path)
-
-    print(file_inst.imported_list)
-    for import_inst in file_inst.imported_list:
-        print(import_inst)
-        if language.new_resolve_import(import_inst, raw_source):
-            print(key)
-            print("IS IN REPO")
-            print(raw_source)
+    # for import_inst in file_inst.imported_list:
+    #     print(import_inst)
+    #     if language.new_resolve_import(import_inst, raw_source):
+    #         print(key)
+    #         print("IS IN REPO")
+    #         print(raw_source)
         
-        else:
-            print(key, "not in the REPO", raw_source)
-        print()
-    for import_inst in file_inst.imported_list :
-            if isinstance(import_inst, dict):
-                check = import_inst.keys()
-            else:
-                check = [import_inst]
-            for raw_source in raw_source_paths:
-                for key in check:
-                    print("the fucking source is raw",raw_source)
-                    if language.resolve_import_path(key,raw_source):
-                        print(key)
-                        print("IS IN REPO")
-                        print(raw_source)
-                    
-                    else:
-                        print(key, "not in the REPO", raw_source)
-                    print()
-
-
+    #     else:
+    #         print(key, "not in the REPO", raw_source)
+    #     print()
 
     # NEXT PR implement nested functino
     for node_tree in node_trees:
@@ -251,12 +232,17 @@ def main(sys_argv=None):
         file_symbol_dict = file_inst.all_symbols_dict()
         print("IMPORT LIST ")
         print(file_inst.imported_list)
+        for import_inst in file_inst.imported_list:
+            if type(import_inst) == dict:
+                [key] = import_inst.keys()
+                file_import = file_group[key]
+                file_import_symbol_dict = file_import.symbol_dict(import_inst[key])
         # out of file import symbol
 
-        for class_inst in classes_int:
-            class_symbol = class_inst.all_symbols_dict()
-            for func in class_inst.functions:
-                check_process(func.process, class_inst,class_symbol , file_symbol_dict )
+    #     for class_inst in classes_int:
+    #         class_symbol = class_inst.all_symbols_dict()
+    #         for func in class_inst.functions:
+    #             check_process(func.process, class_inst,class_symbol , file_symbol_dict )
 
         
 

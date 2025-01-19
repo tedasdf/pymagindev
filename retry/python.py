@@ -470,7 +470,33 @@ class Python():
     @staticmethod
     def new_resolve_import(import_inst, base_dir):
         if type(import_inst) == dict:
-            print("")
+            import_path = import_inst.keys()
+            if import_path == None:
+                return False
+            # Split the import into its parts
+            path_parts = import_path.split('.')
+            
+            # Start from the base directory (repo root)
+            current_path = base_dir
+            print("Base directory:", current_path)
+            
+            # Try to resolve the path progressively
+            partial_path = '.\\'
+            for i in path_parts:
+                partial_path = os.path.join(partial_path ,i)
+                print(partial_path)
+                if partial_path in current_path or partial_path == current_path:
+                    continue
+                elif current_path in partial_path:
+                    print(partial_path)
+                    if os.path.isdir(partial_path):
+                        continue
+                    else:
+                        return False
+                else:
+                    partial_path = os.path.join(current_path,partial_path)
+            
+            return True
         raise NotImplementedError
     
     @staticmethod

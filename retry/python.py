@@ -519,19 +519,28 @@ class Python():
         for i in path_parts:
             partial_path = os.path.join(partial_path ,i)
             if partial_path in current_path or partial_path == current_path:
+                print(1)
                 continue
             elif current_path in partial_path:
+                print(2)
                 print("Before cjheck", partial_path)
                 if os.path.isdir(partial_path):
                     continue
                 else:
                     return False
             else:
+                print(3)
+                partial_path = partial_path.lstrip('.\\')
                 partial_path = os.path.join(current_path,partial_path)
+        print("Finsih path",partial_path)
+        if os.path.isdir(partial_path):
+            return True
+        else:
+            partial_path += '.py'
+            if os.path.exists(partial_path):
+                return True
+        return False
         
-        return True
-
-
     
     @staticmethod
     def make_import(trees, file_path, raw_source_path):
@@ -556,6 +565,8 @@ class Python():
                 # Append the import directly
 
                 if Python.resolve_import_path(from_inst , raw_source_path): # only path check , not detailed enough
+                    print("THIS IS APPEND IN IMPORT LIST")
+                    print(from_inst)
                     import_list.append({from_inst: names_list})
             
             elif isinstance(import_tree, ast.Import):
@@ -565,7 +576,10 @@ class Python():
                     for alias in import_tree.names
                 ]
                 # Append the import directly
-                if Python.resolve_import_path(from_inst , raw_source_path): # only path check , not detailed enough
-                    import_list.extend(names_list)
+                temp_list = []
+                for i in names_list:
+                    if Python.resolve_import_path(i , raw_source_path): # only path check , not detailed enough
+                        temp_list.append(names_list)
+                import_list.append(temp_list)
         
         return import_list

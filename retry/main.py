@@ -92,7 +92,7 @@ def make_file_group(tree, file_path, raw_source_paths):
     print(file_inst.file_path)
     [raw_source_path] = raw_source_paths
     file_inst.imported_list = language.make_import(import_trees, file_inst.file_path, raw_source_path)
-
+    print(file_inst.imported_list)
     # for import_inst in file_inst.imported_list:
     #     print(import_inst)
     #     if language.new_resolve_import(import_inst, raw_source):
@@ -229,7 +229,7 @@ def main(sys_argv=None):
         print(file_key)
         classes_int = file_inst.classes_list
         # in file symbol 
-        file_symbol_dict = file_inst.all_symbols_dict()
+        file_symbol_dict = file_inst.symbols_dict()
         print("IMPORT LIST ")
         print(file_inst.imported_list)
         for import_inst in file_inst.imported_list:
@@ -237,12 +237,12 @@ def main(sys_argv=None):
                 [key] = import_inst.keys()
                 file_import = file_group[key]
                 file_import_symbol_dict = file_import.symbol_dict(import_inst[key])
+                file_symbol_dict = {**file_symbol_dict, **file_import_symbol_dict}
         # out of file import symbol
-
-    #     for class_inst in classes_int:
-    #         class_symbol = class_inst.all_symbols_dict()
-    #         for func in class_inst.functions:
-    #             check_process(func.process, class_inst,class_symbol , file_symbol_dict )
+        for class_inst in classes_int:
+            class_symbol = class_inst.all_symbols_dict()
+            for func in class_inst.functions:
+                check_process(func.process, class_inst,class_symbol , file_symbol_dict )
 
         
 

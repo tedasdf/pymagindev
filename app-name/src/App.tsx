@@ -11,6 +11,7 @@ const initialEdges: any[] = [];
 
 const nodeType = {
   "functionNode": FunctionNode,
+  "file_node": FileNode
 }
 
 // const edgeType = {

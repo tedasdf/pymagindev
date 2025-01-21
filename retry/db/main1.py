@@ -5,8 +5,6 @@ from typing import Dict, List, Optional, Tuple, Union
 class CallModel(BaseModel):
     func_token: str
     parent: Tuple[str, str]  # Parent type (file, function) and token (either file or class)
-    arguement: List[str]
-
 
 class VariableModel(BaseModel):
     token: str
@@ -23,8 +21,6 @@ class FunctionModel(BaseModel):
     token: str  # Name of the function
     parent: Tuple[str ,str]  # A tuple with (parent type, token)
     process: List[Union[CallModel, VariableModel, str]]  # A list of Call, Variable, or string
-    input: List[str]
-    output: List[str]
 
 class ClassModel(BaseModel):
     token: str

@@ -11,7 +11,7 @@ const initialNodes = [
   {
     id: 'parent',
     type: 'parentNodeType',
-    data: { label: 'metrics' },
+    data: { label: 'traces' },
     position: { x: 0, y: 0 },
     style: {
       width: 380,

@@ -1,18 +1,44 @@
-import {React , useState} from 'react';
-import { ReactFlow, useNodesState, useEdgesState, Background, MiniMap, Controls } from '@xyflow/react';
+import React , {useState} from 'react';
+import { ReactFlow, useNodesState, useEdgesState, Background, MiniMap, Controls } from 'reactflow';
 import '@xyflow/react/dist/style.css';
-import fetchAndCreateNodes from './utils/helper'
-import FunctionNode from './components/nodes/FunctionNode';
+import FunctionNode from './components/react-flow/nodes/FunctionNode';
+import ParentsNode from './components/react-flow/nodes/ParentsNode';
+import ExportersNode from './components/react-flow/nodes/ExportersNode';
+import ReceiversNode from './components/react-flow/nodes/ReceiversNode';
+import ProcessorsNode from './components/react-flow/nodes/ProcessorsNode';
 
-const initialNodes: any[] = [];
+const initialNodes = [
+  {
+    id: 'parent',
+    type: 'parentNodeType',
+    data: { label: 'metrics' },
+    position: { x: 0, y: 0 },
+    style: {
+      width: 380,
+      height: 180,
+    },
+  },
+  {
+    id: 'child',
+    type: 'childNodeType',
+    data: { label: 'Child' },
+    position: { x: 50, y: 50 },
+    parentNode: 'parent',
+    extent: 'parent'
+  }
+];
 
 const initialEdges: any[] = [];
 
 
 const nodeType = {
   "functionNode": FunctionNode,
-  "file_node": FileNode
+  "parentNodeType": ParentsNode,
+  "processorsNode": ProcessorsNode,
+	"receiversNode": ReceiversNode,
+	"exportersNode": ExportersNode,
 }
+
 
 // const edgeType = {
 //   // "variablePointsToEdge" : VariablePointsToEdge;
@@ -23,28 +49,27 @@ const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
 
 
 
-const HoverEffectNodes = () => {
+const Flow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges,, onEdgesChange] = useEdgesState(initialEdges);
-  const [isButtonVisible, setButtonVisible] = useState(true); // Add state for button visibility
+  const [edges,, onEdgesChange] = useEdgesState(initialEdges);// Add state for button visibility
   
-  const startseq = async () => {
-    setButtonVisible(false);
-    console.log("Trigger useEffect");
-    let newNode = await fetchAndCreateNodes(nodes);
-    console.log("This is newNode ")
-    console.log(newNode);
-    if (newNode) {
-      await setNodes((nds) => [...nds, ...newNode]); // Append new nodes to existing nodes
-    }
-  };
+  // const startseq = async () => {
+  //   setButtonVisible(false);
+  //   console.log("Trigger useEffect");
+  //   let newNode = await fetchAndCreateNodes(nodes);
+  //   console.log("This is newNode ")
+  //   console.log(newNode);
+  //   if (newNode) {
+  //     await setNodes((nds) => [...nds, ...newNode]); // Append new nodes to existing nodes
+  //   }
+  // };
 
  
   
-  const onNodeClick = (event: React.MouseEvent, node: any) => {
-    console.log("NOdes");
-    console.log(nodes);
-  }
+  // const onNodeClick = (event: React.MouseEvent, node: any) => {
+  //   console.log("NOdes");
+  //   console.log(nodes);
+  // }
   //   setNodes((nds) =>
   //     nds.map((n) => {
   //       if (n.id === node.id) {
@@ -88,29 +113,26 @@ const HoverEffectNodes = () => {
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
-      onNodeClick={onNodeClick}
+      nodeTypes={nodeType}
       defaultViewport={defaultViewport}
       minZoom={0.2}
-      style={{ background: '#F7F9FB' }}
+      className="disable-attribution bg-default"
       maxZoom={4}
       fitView
     >
       <Background />
       <Controls />
       <MiniMap 
-        nodeColor={(node) => {
-          return node.style?.backgroundColor || '#eee';
-        }}
         zoomable 
         pannable 
       />
     </ReactFlow>
-    {isButtonVisible && <button 
+    {/* {isButtonVisible && <button 
     onClick={startseq}
     style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 10 }} // Adjust position and zIndex
-    >Start</button>} {/* Show button conditionally */}
+    >Start</button>} Show button conditionally */}
     </>
   );
 };
 
-export default HoverEffectNodes;
+export default Flow;

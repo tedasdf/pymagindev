@@ -4,7 +4,7 @@
 import type { IData } from "../FlowChart";
 import Node, { handleStyle } from "./Node";
 import { memo } from "react";
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position } from 'reactflow';
 
 const ReceiversNode = ({ data }: { data: IData }) => {
 	return (

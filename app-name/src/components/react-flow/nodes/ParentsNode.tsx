@@ -44,6 +44,7 @@ export const parentNodesConfig = [
 const ParentsNode = ({ data }: { data: IData }) => {
 	return (
 		<>
+
 			{parentNodesConfig
 				.filter((config) => data.label.match(config.typeRegex))
 				.map((node, idx) => {
@@ -52,10 +53,11 @@ const ParentsNode = ({ data }: { data: IData }) => {
 							id={"parentNode"}
 							key={idx}
 							style={{
+								display: "flex",
+								justifyContent: "space-between",
+								position: "relative",
 								backgroundColor: node.backgroundColor,
 								border: node.borderColor,
-								height: data.height,
-								width: data.width,
 							}}
 							className="rounded-[4px] text-[10px] text-black"
 						>

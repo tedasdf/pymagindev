@@ -1,4 +1,4 @@
-import React , {useState} from 'react';
+
 import { ReactFlow, useNodesState, useEdgesState, Background, MiniMap, Controls } from 'reactflow';
 import '@xyflow/react/dist/style.css';
 import FunctionNode from './components/react-flow/nodes/FunctionNode';
@@ -14,8 +14,8 @@ const initialNodes = [
     data: { label: 'traces' },
     position: { x: 0, y: 0 },
     style: {
-      width: 380,
-      height: 180,
+      width: 150,
+      height: 150,
     },
   },
   {
@@ -115,10 +115,9 @@ const Flow = () => {
       onEdgesChange={onEdgesChange}
       nodeTypes={nodeType}
       defaultViewport={defaultViewport}
-      minZoom={0.2}
-      className="disable-attribution bg-default"
       maxZoom={4}
       fitView
+			className="disable-attribution bg-default"
     >
       <Background />
       <Controls />

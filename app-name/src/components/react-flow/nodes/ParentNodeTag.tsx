@@ -22,9 +22,19 @@ export default function ParentNodeTag({ tag }: { tag: string }) {
 				.map((node, idx) => {
 					return (
 						<div
-							key={idx}
-							style={{ backgroundColor: node.tagBackgroundColor, borderRadius: "4px 0px 4px 0px" }}
-							className="flex w-fit items-center gap-x-1 px-2 py-1 text-xs font-semibold text-black -ml-[1px] -mt-[1px]"
+							key={node.type}
+							style={{
+								position: "absolute",
+								top: 0,
+								left: 0,
+								display: "flex",
+								alignItems: "center",
+								backgroundColor: node.tagBackgroundColor,
+								borderRadius: "4px 0px 4px 0px",
+								height: "20px",
+								columnGap: "4px",
+							}}
+							className="px-2 text-xs font-semibold text-black -ml-[1px] -mt-[1px] py-4"
 						>
 							<p>{FormatTag(tag)}</p>
 						</div>

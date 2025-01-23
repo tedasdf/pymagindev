@@ -26,9 +26,6 @@ const Node = ({
 		borderRadius: "8px 8px 0px 0px",
 	};
 
-	const iconColor = {
-		color: hovered ? "#F3F5F6" : "#9CA2AB",
-	};
 
 	const customNodeStyles = {
 		display: "flex",
@@ -79,6 +76,7 @@ const Node = ({
 						splitLabel[1] && splitLabel[1].length > 0 && "mt-[2px]"
 					}`}
 				>
+
 					{splitLabel.length > 1 && (
 						<div
 							className={`${

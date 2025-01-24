@@ -24,8 +24,8 @@ export const NodeTag = ({
 
     return (
     <div
-        style={{ borderRadius: "0 4px 0 4px "}}
-        className={`flex w-fit items-center gap-x-1 px-2 py-1 text-xs font-semibold text-black -ml-[1px] -mt-[1px] ${labelBGColor} border-1 border-black`}
+        style={{ borderRadius: "4px"}}
+        className={`flex w-fit items-center gap-x-1 px-2 py-1 text-xs font-semibold text-black -ml-[1px] -mt-[1px] -mb-[1px] ${labelBGColor}`}
       >
         <p className={`${labelTextColor}`}>{type}</p>
       </div>

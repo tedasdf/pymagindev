@@ -16,14 +16,14 @@ const ClassNode = ({
             key={token_name}
             style={{
                 backgroundColor: "rgba(145, 29, 201, 0.05)" ,
-                border: "1px dashed black"
-            }}>
+                border: "1px dashed black",
+                borderRadius: "4px"
+            }}
+            className={`flex`}>
             <NodeTag type="class" />
-            <div
-				className={`px-3 text-xs font-medium overflow-hidden whitespace-nowrap overflow-ellipsis w-full flex justify-center`}
-			>
-				{token_name}
-			</div>
+            <div className="flex items-center px-3 text-xs font-medium overflow-hidden whitespace-nowrap overflow-ellipsis w-full">
+                {token_name}
+            </div>
         </div>
     )
 }

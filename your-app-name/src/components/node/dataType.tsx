@@ -5,6 +5,8 @@ export interface IFile{
     constants?: string[];
     classes?: IClass[];
     functions?: IFunction[];
+    width: number,
+    height: number
 }
 
 export interface IClass{
@@ -15,9 +17,9 @@ export interface IClass{
 
 export interface IFunction {
     name: string;
-    proces: (Variable | Call | LogicStatement)[];
-    input: string[];
-    output: string[];
+    proces?: (Variable | Call | LogicStatement)[];
+    input?: string[];
+    output?: string[];
 }
   
 interface Variable {

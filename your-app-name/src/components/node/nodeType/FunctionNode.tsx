@@ -2,6 +2,7 @@ import { memo } from "react";
 import { IFunction } from "../dataType";
 import { NodeTag } from "./NodeTag";
 import { Handle, Position } from '@xyflow/react';
+import { getHandleStyle } from "../utils";
 
 const FunctionNode = ({
     data, isConnectable ,
@@ -10,17 +11,12 @@ const FunctionNode = ({
     isConnectable: boolean
 }) => {
     const token_name = data.name;
-
-    const getHandleStyle = (index: number, total: number) => {
-        const spacing = 100 / (total+1); // 100% / number of handles
-        const position = spacing * (index+1);
     
-        return { left: `${position}%` };
-      };
+    const input_length = data.input?.length ?? 0;
+    const output_length = data.output?.length ?? 0;
 
     return (
         <div
-            id={"parentNode"}
             key={token_name}
             style={{
                 backgroundColor: "rgba(145, 29, 201, 0.05)" ,
@@ -34,7 +30,7 @@ const FunctionNode = ({
             </div>
 
             {/* Dynamically create handles based on input */}
-            {data.input && data.input.length > 0 && (
+            {data.input && input_length > 0 && (
             <>
             {data.input.map((_, index) => (
                 <Handle
@@ -43,12 +39,12 @@ const FunctionNode = ({
                 position={Position.Top}
                 id={`input-${index}`}
                 isConnectable={isConnectable}
-                style={getHandleStyle(index, data.input.length)}
+                style={getHandleStyle(index, input_length)}
                 />
             ))}
             </>
             )}
-            {data.output && data.output.length > 0 && (
+            {data.output && output_length > 0 && (
             <>
             {data.output.map((_, index) => (
                 <Handle
@@ -57,7 +53,7 @@ const FunctionNode = ({
                 position={Position.Bottom}
                 id={`input-${index}`}
                 isConnectable={isConnectable}
-                style={getHandleStyle(index, data.output.length)}
+                style={getHandleStyle(index, output_length)}
                 />
             ))}
             </>

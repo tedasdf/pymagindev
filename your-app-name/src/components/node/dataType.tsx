@@ -9,6 +9,7 @@ export interface IFile{
     height: number
 }
 
+
 export interface IClass{
     name: string;
     functions?: IFunction[];
@@ -22,6 +23,13 @@ export interface IFunction {
     output?: string[];
 }
   
+
+export interface LogicStatement {
+    type: string;
+    expression: string; // representing a logical expression as a string (you can use other types too)
+    process?: (Variable|Call)[];
+}
+
 interface Variable {
     type: "variable";
     name: string; // example of a variable having a name
@@ -34,7 +42,3 @@ interface Call {
     args: any[]; // arguments for the function call
 }
 
-interface LogicStatement {
-    type: "logic";
-    expression: string; // representing a logical expression as a string (you can use other types too)
-}

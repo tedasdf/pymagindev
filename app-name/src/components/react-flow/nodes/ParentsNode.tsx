@@ -3,13 +3,7 @@
 
 import { memo } from "react";
 import ParentNodeTag from "./ParentNodeTag";
-
-interface IData {
-	label: string;
-	height: number;
-	position: { x: number; y: number };
-	width: number;
-}
+import type { IData } from "../FlowChart";
 
 export const parentNodesConfig = [
 	{

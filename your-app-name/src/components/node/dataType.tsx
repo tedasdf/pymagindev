@@ -26,8 +26,8 @@ export interface IFunction {
 
 export interface LogicStatement {
     type: string;
-    expression: string; // representing a logical expression as a string (you can use other types too)
-    process?: (Variable|Call)[];
+    expression: string[]; // representing a logical expression as a string (you can use other types too)
+    branch: number;
 }
 
 interface Variable {
@@ -36,9 +36,9 @@ interface Variable {
     value?: any; // optional value for the variable
 }
 
-interface Call {
-    type: "call";
+export interface Call {
     functionName: string;
-    args: any[]; // arguments for the function call
+    args?: any[]; // arguments for the function call
+    outputs?: string[];
 }
 

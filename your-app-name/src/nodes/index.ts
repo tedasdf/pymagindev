@@ -2,10 +2,11 @@ import type { NodeTypes } from '@xyflow/react';
 
 import { PositionLoggerNode } from './PositionLoggerNode';
 import ClassNode from '../components/node/nodeType/ClassNode';
-import FunctionNode from '../components/node/nodeType/functionNode';
+import FunctionNode from '../components/node/nodeType/FunctionNode';
 import FileNode from '../components/node/nodeType/FileNode';
 import ConstantNode from '../components/node/nodeType/ConstantNode';
 import LogicStatNode from '../components/node/nodeType/LogicStatNode';
+import CallNode from '../components/node/nodeType/CallNode';
 
 export const initialNodes = [
   {
@@ -16,7 +17,7 @@ export const initialNodes = [
     data: { 
       token: 'clin/agent.py',
       width: 250,
-      height: 250
+      height: 250,
     },
     style: {
       width: 250,
@@ -28,9 +29,22 @@ export const initialNodes = [
     type:'logicstateNode',
     position:{x : 100 , y: 100},
     data: {
-      type: 'if'
+      type: 'if',
+      branch: 3
     },
     draggable: true,
+  },
+  {
+    id:'function-error',
+    type:'callNode',
+    position: { x: 0 , y : 50},
+    data:{
+      functionName:'raiseerror'
+    },
+    style:{
+      width: '10px', // small rectangle width
+      height: '5px', // small rectangle height
+    }
   },
   // {
   //   id: '1' , 
@@ -80,24 +94,13 @@ export const initialNodes = [
   //   parentId: 'clin/agent.py',
   //   extent: 'parent',
   // },
-  { id: 'a', type: 'classNode', position: { x: 0, y: 0 }, data: { name: 'CLIN' } ,
-  parentId: 'clin/agent.py',
-  extent: 'parent',
+  { id: 'a', type: 'classNode', position: { x: 0, y: 0 }, data: { name: 'CLIN' } 
   },
-  {
-    id: 'b',
-    type: 'position-logger',
-    position: { x: -100, y: 100 },
-    data: { label: 'drag me!' },
-  },
-  { id: 'c', position: { x: 100, y: 100 }, data: { label: 'your ideas' } },
   {
     id: 'd',
     type: 'functionNode', 
     position: { x: 0, y: 10 },
-    data: { name: 'with React Flow'  , input:["input1" , "INPUT2"] , output:["x" , "y" , "z"]},
-    parentId: 'clin/agent.py',
-    extent: 'parent',
+    data: { name: 'with React Flow'  , input:["input1" , "INPUT2"] , output:["x" , "y" , "z"]}
   },
   
   // {
@@ -137,7 +140,8 @@ export const nodeTypes = {
   'functionNode': FunctionNode,
   'fileNode': FileNode,
   'constantNode': ConstantNode,
-  'logicstateNode': LogicStatNode
+  'logicstateNode': LogicStatNode,
+  'callNode': CallNode
   // Add any of your custom nodes here!
 } satisfies NodeTypes;
 

@@ -51,7 +51,7 @@ const FunctionNode = ({
                 key={`output-${index}`}
                 type="source"
                 position={Position.Bottom}
-                id={`input-${index}`}
+                id={`output-${index}`}
                 isConnectable={isConnectable}
                 style={getHandleStyle(index, output_length)}
                 />

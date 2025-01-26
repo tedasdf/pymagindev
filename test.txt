@@ -1,0 +1,113 @@
+
+(pymag) C:\Users\teeds\Desktop\projects\pymagindev\retry>python main.py ./test/test_example10/test.py
+=================================================================================================
+FILE_TOKEN:
+./test/test_example10/test.py
+CLASS NAME
+ReActGeneralStrategy
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+FUNC TOKEN
+generate
+INPUT LIST
+['self', 'question', 'examples', 'prompt', 'additional_keys', 'reset']
+OUTPUT LIST
+['out']
+AFter process
+[Variable token=start point_to=[<Call func=time line_no=70 parent_token=time taken_var=[]>] line_no=70]
+
+LogicStatement cond=if else=None
+if 1
+['reset']
+<Call func=reset line_no=73 parent_token=self taken_var=[]>
+
+
+[Variable token=scratchpad point_to=['Constant'] line_no=75]
+
+[Variable token=answer point_to=['Constant'] line_no=76]
+
+[Variable token=finished point_to=['Constant'] line_no=77]
+
+[Variable token=idx point_to=['Constant'] line_no=78]
+
+[Variable token=steps point_to=['List'] line_no=79]
+
+LogicStatement cond=while else=None
+while 1
+[<Call func=halting_condition line_no=80 parent_token=self taken_var=['finished', 'idx', 'question', 'scratchpad', 'examples', 'prompt', 'additional_keys']>]
+[Variable token=scratchpad point_to=[<Call func=generate_thought line_no=90 parent_token=self taken_var=['idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']>] line_no=90, Variable token=thought point_to=[<Call func=generate_thought line_no=90 parent_token=self taken_var=['idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']>] line_no=90, Variable token=thought_response point_to=[<Call func=generate_thought line_no=90 parent_token=self taken_var=['idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']>] line_no=90]
+
+[Variable token=scratchpad point_to=[<Call func=generate_action line_no=100 parent_token=self taken_var=['idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']>] line_no=100, Variable token=action_type point_to=[<Call func=generate_action line_no=100 parent_token=self taken_var=['idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']>] line_no=100, Variable token=query point_to=[<Call func=generate_action line_no=100 parent_token=self taken_var=['idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']>] line_no=100, Variable token=action_response point_to=[<Call func=generate_action line_no=100 parent_token=self taken_var=['idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']>] line_no=100]       
+
+[Variable token=scratchpad point_to=[<Call func=generate_observation line_no=111 parent_token=self taken_var=['idx', 'scratchpad', 'action_type', 'query']>] line_no=110, Variable token=answer point_to=[<Call func=generate_observation line_no=111 parent_token=self taken_var=['idx', 'scratchpad', 'action_type', 'query']>] line_no=110, Variable token=obs point_to=[<Call func=generate_observation line_no=111 parent_token=self taken_var=['idx', 'scratchpad', 'action_type', 'query']>] line_no=110, Variable token=finished point_to=[<Call func=generate_observation line_no=111 parent_token=self taken_var=['idx', 'scratchpad', 'action_type', 'query']>] line_no=110, Variable token=external_tool_info point_to=[<Call func=generate_observation line_no=111 parent_token=self taken_var=['idx', 'scratchpad', 'action_type', 'query']>] line_no=110]
+
+<Call func=append line_no=116 parent_token=steps taken_var=[<Call func=ReActStepOutput line_no=117 parent_token=None taken_var=['thought', 'action_type', 'query', 'obs', 'answer', 'external_tool_info', 'thought_response', 'action_response']>]>
+
+[Variable token=idx point_to=['Constant'] line_no=129]
+
+
+[Variable token=total_time point_to=[<Call func=time line_no=131 parent_token=time taken_var=[]>, 'start'] line_no=131]
+
+[Variable token=total_metrics point_to=[<Call func=accumulate_metrics line_no=132 parent_token=None taken_var=['steps']>] line_no=132]
+
+[Variable token=out point_to=[<Call func=ReActOutput line_no=133 parent_token=None taken_var=['answer', 'total_metrics', 'total_metrics', 'total_metrics', 'total_metrics', 'total_metrics', 'total_metrics', 'total_metrics', LogicStatement cond=ifExp else=['Constant'], 'steps']>] line_no=133]
+
+After print
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+FUNC TOKEN
+generate_thought
+INPUT LIST
+['self', 'idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']
+OUTPUT LIST
+['scratchpad', 'thought', 'out']
+AFter process
+[Variable token=scratchpad point_to=['idx'] line_no=170]
+
+[Variable token=out point_to=[<Call func=_prompt_agent line_no=172 parent_token=None taken_var=[('self', 'llm'), 'question', 'scratchpad', 'examples', ('self', 'max_steps'), 'prompt', 'additional_keys']>] line_no=172]
+
+[Variable token=thought point_to=[<Call func=strip line_no=181 parent_token=unknown taken_var=[]>] line_no=181]
+
+[Variable token=scratchpad point_to=['thought'] line_no=182]
+
+After print
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+FUNC TOKEN
+generate_action
+INPUT LIST
+['self', 'idx', 'scratchpad', 'question', 'examples', 'prompt', 'additional_keys']
+OUTPUT LIST
+[]
+AFter process
+After print
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+FUNC TOKEN
+generate_observation
+INPUT LIST
+['self', 'idx', 'scratchpad', 'action_type', 'query']
+OUTPUT LIST
+[]
+AFter process
+After print
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+FUNC TOKEN
+halting_condition
+INPUT LIST
+['self', 'finished', 'idx', 'question', 'scratchpad', 'examples', 'prompt', 'additional_keys']
+OUTPUT LIST
+["Call(func=Name(id='_is_halted', ctx=Load()), args=[], keywords=[keyword(arg='finished', value=Name(id='finished', ctx=Load())), keyword(arg='idx', value=Name(id='idx', ctx=Load())), keyword(arg='question', value=Name(id='question', ctx=Load())), keyword(arg='scratchpad', value=Name(id='scratchpad', ctx=Load())), keyword(arg='examples', value=Name(id='examples', ctx=Load())), keyword(arg='max_steps', value=Attribute(value=Name(id='self', ctx=Load()), attr='max_steps', ctx=Load())), keyword(arg='max_tokens', value=Attribute(value=Name(id='self', ctx=Load()), attr='max_tokens', ctx=Load())), keyword(arg='enc', value=Attribute(value=Name(id='self', ctx=Load()), attr='enc', ctx=Load())), keyword(arg='prompt', value=Name(id='prompt', ctx=Load())), keyword(arg='additional_keys', value=Name(id='additional_keys', ctx=Load()))])"]
+AFter process
+After print
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+FUNC TOKEN
+reset
+INPUT LIST
+['self']
+OUTPUT LIST
+[]
+AFter process
+After print
+[]
+=================================================================================================
+FILE KEY
+./test/test_example10/test.py
+FILE SYMBOL
+      <model.File object at 0x000002A90FFE9A50>

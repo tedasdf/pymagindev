@@ -8,6 +8,7 @@ import asyncio
 
 from python import Python
 from model import Call, File, LogicStatement, UserDefinedClass, Variable, UserDefinedFunc
+from utils import find_match
 # from db.main import CallModel, FileModel, FunctionModel, VariableModel
 
 
@@ -68,7 +69,7 @@ def get_sources_and_language(raw_source_paths):
     sources = sorted(list(sources))
     return sources
 
-def make_file_group(tree, file_path):
+def make_file_group(tree, file_path, raw_source_paths):
     """
     Given an AST for the entire file, generate a file group complete with
     subgroups, nodes, etc.
@@ -89,8 +90,20 @@ def make_file_group(tree, file_path):
     print("=================================================================================================")
     print("FILE_TOKEN:")
     print(file_inst.file_path)
+    [raw_source_path] = raw_source_paths
+    file_inst.imported_list = language.make_import(import_trees, file_inst.file_path, raw_source_path)
+    print(file_inst.imported_list)
+    # for import_inst in file_inst.imported_list:
+    #     print(import_inst)
+    #     if language.new_resolve_import(import_inst, raw_source):
+    #         print(key)
+    #         print("IS IN REPO")
+    #         print(raw_source)
+        
+    #     else:
+    #         print(key, "not in the REPO", raw_source)
+    #     print()
 
-    file_inst.import_list = language.make_import(import_trees)
     # NEXT PR implement nested functino
     for node_tree in node_trees:
         file_inst.add_func_list(language.make_function(node_tree, parent=file_inst))
@@ -105,6 +118,74 @@ def make_file_group(tree, file_path):
     # print(file_inst.classes_list)
     print("=================================================================================================")
     return file_inst
+
+UNKNOWN_FUNC = 'unknown_func'
+
+
+
+
+def check_file_reference(instes , parent , global_symbol , local_symbol):
+    
+    for inst in  instes:
+        print("FOR LOOPING INSTS")
+        if not isinstance(inst, Call):
+            continue
+        checking_token = inst.func
+        parent_token = inst.parent_token
+        print(inst)
+        print(checking_token)
+        if isinstance(parent, UserDefinedClass) and parent_token == 'self':
+            # If it's a method call inside a class (via 'self')
+            key = find_match(list(local_symbol.keys()),checking_token)
+            if key:
+                inst.func = local_symbol[key]
+            else:
+                inst.func = UNKNOWN_FUNC
+                print("Self and not in class need to check inherit")
+        elif isinstance(parent, UserDefinedClass) and parent_token != 'self':
+            # If it's a method call via an instance (like 'a.test()')
+            # You need to get the class name of the instance `a` and combine it with the method name
+            key = find_match(list(global_symbol.keys()),checking_token)
+            if key:
+                inst.func = global_symbol[key]
+            else:
+                inst.func = UNKNOWN_FUNC
+                # highly likely so that it is not 
+        elif parent_token != None:
+            ### TODO
+            # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
+            checking_token = parent_token + checking_token
+        else: # this is for pure function inside a file not in class 
+            key = find_match(list(global_symbol.keys()),checking_token)
+            if key:
+                inst.func = global_symbol[key]
+            else:
+                inst.func = UNKNOWN_FUNC
+
+            # if the function is a symbol wihtin the file , it will be referecne to the corresponding symbol
+            # if the function is a symbol within the class, it will also be refenced 
+            # if the function is a function from some other library:
+                # if the function has no variable inpit , it is regarded as a constant 
+                # ifthe function is a function with variable input  it is consider as f(variable 1, variable2, varaible3 , .....)
+
+
+def check_process(processes, parent, local_symbol , global_symbol):
+    for pro in processes:
+        if isinstance(pro, Call):
+            print("THIS IS CALL")
+            check_file_reference([pro] , parent, global_symbol , local_symbol)
+        elif isinstance(pro, Variable):
+            print("THIS IS VARIABLE")
+            check_file_reference(pro.points_to , parent, global_symbol , local_symbol)
+        if isinstance(pro, LogicStatement):
+            print(pro.condition_type)
+            check_process(pro.condition, parent, local_symbol , global_symbol )
+            check_process(pro.process, parent, local_symbol , global_symbol )
+            if pro.else_branch:
+                print()
+                check_process(pro.else_branch, parent, local_symbol , global_symbol )
+
+        print()
 
 def main(sys_argv=None):
     """
@@ -137,11 +218,33 @@ def main(sys_argv=None):
         except Exception as ex:
             raise ex
 
-    # NEXT PR Folder group
     file_group = {}
     for source, file_ast_tree in file_ast_trees:
-        file_group[str(source)] = make_file_group(file_ast_tree, source)
+        file_group[str(source)] = make_file_group(file_ast_tree, source,raw_source_paths)
 
+
+    print('Start Function and file referencing')
+    # only in class function referencing 
+    for file_key , file_inst in file_group.items():
+        print(file_key)
+        classes_int = file_inst.classes_list
+        # in file symbol 
+        file_symbol_dict = file_inst.symbols_dict()
+        print("IMPORT LIST ")
+        print(file_inst.imported_list)
+        for import_inst in file_inst.imported_list:
+            if type(import_inst) == dict:
+                [key] = import_inst.keys()
+                file_import = file_group[key]
+                file_import_symbol_dict = file_import.symbol_dict(import_inst[key])
+                file_symbol_dict = {**file_symbol_dict, **file_import_symbol_dict}
+        # out of file import symbol
+        for class_inst in classes_int:
+            class_symbol = class_inst.all_symbols_dict()
+            for func in class_inst.functions:
+                check_process(func.process, class_inst,class_symbol , file_symbol_dict )
+
+        
 
     ######################################################  
     # for file_key, file_symbol in file_group.items():
@@ -156,65 +259,26 @@ def main(sys_argv=None):
     ######################################################                
 
 
-    for file_key, file_symbol in file_group.items():
-        print("FILE KEY")
-        print(file_key)
-        print("FILE SYMBOL")
-        print("     ",file_symbol)
-        # Iterate through all functions in the current file
-        for func in file_symbol.all_func():
-            print(func.token)
-            for single_process in func.process:
-                process = single_process
-
-                # Extract the comparing token based on the type of `process`
-                parent = None
-                if isinstance(process, Call):
-                    comparing_token = process.func
-                    parent = process.parent_token
-                elif isinstance(process, Variable):
-                    comparing_token = process.points_to.func
-                    parent = process.points_to.parent
-                else:
-                    continue  # Skip if the process is neither a Call nor a Variable
-            
-        #         # Find the matching symbol for the comparing token
-        #         substitute = None
-        #         for comp in file_symbol.all_symbols():
-        #             if comp.token == comparing_token and parent == None:# Not yet have class function so this will be good for now
-        #                 substitute = comp
-        #                 break
-
-        #         # If a match is found, update the process attributes
-        #         if substitute:
-        #             if isinstance(process, Call):
-        #                 process.func = substitute
-        #             elif isinstance(process, Variable):
-        #                 process.points_to.func = substitute
-        #             continue
-
-
-                    
-    for file_key, file_symbol in file_group.items():
-        # file_model = FileModel( token=file_symbol.token ,
-        #                         path=file_key)
-        for func in file_symbol.all_func():
-            # function_model = FunctionModel( token=func.token,
-            #                                 parent=file_model)
-            # print(func.token)
-            output= []
-            for process in func.process:
-                if isinstance(process, Call) and isinstance(process.func, UserDefinedFunc):
-                        output.append(process)
-                elif isinstance(process, Variable) and isinstance(process.points_to.func, (UserDefinedClass, UserDefinedFunc)):
-                    output.append(process)
-            # print()
-            # print(output)
-            # print()
-            # print("==================================================")
-            # print()
-            # print()
-            func.output = output
+    # for file_key, file_symbol in file_group.items():
+    #     # file_model = FileModel( token=file_symbol.token ,
+    #     #                         path=file_key)
+    #     for func in file_symbol.all_func():
+    #         # function_model = FunctionModel( token=func.token,
+    #         #                                 parent=file_model)
+    #         # print(func.token)
+    #         output= []
+    #         for process in func.process:
+    #             if isinstance(process, Call) and isinstance(process.func, UserDefinedFunc):
+    #                     output.append(process)
+    #             elif isinstance(process, Variable) and isinstance(process.points_to.func, (UserDefinedClass, UserDefinedFunc)):
+    #                 output.append(process)
+    #         # print()
+    #         # print(output)
+    #         # print()
+    #         # print("==================================================")
+    #         # print()
+    #         # print()
+    #         func.output = output
 
 
     # file_model = None

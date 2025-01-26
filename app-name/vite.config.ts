@@ -3,8 +3,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   server: {
-    port: 3000, // Change this to your desired port
+    port: 3001, // Change this to your desired port
   },
 })

@@ -13,8 +13,11 @@ export default async function fetchAndCreateNodes(nodes: Node[]) {
         if (result) {
             console.log("First Check");
             for (const item of result) {
-                if (item.function_list) {
+                let num_function = 0 ;
+                let num_class = 0;
+                if (item.function_list) {   
                     for (const functionItem of item.function_list) { // Iterate over function_list
+                        
                         const newNodeId = `func-${functionItem.token}`;
                         if (nodes.some(node => node.id === newNodeId)) {
                             console.log(`Node with id ${newNodeId} already exists, skipping...`);
@@ -33,36 +36,37 @@ export default async function fetchAndCreateNodes(nodes: Node[]) {
                                 display: 'block'
                             }
                         });
+                        num_function += 1;
                         console.log("THis is the type of functionITem process");
                         functionItem.process.forEach((item) => {
                             if (typeof item === 'string') {
-                                console.log("String item:", item);
-                                newNode.push({ // Append new node info to newNode array
-                                    id: `func-${functionItem.token}-process-${item}`,
-                                    type: 'default',
-                                    data: { label: `${functionItem.token}-process-${item}`}, // Use functionItem.token
-                                    position: { x: 100 + nodes.length * 100, y: 100 },
-                                    style: { 
-                                        backgroundColor: '#dbdbdb',
-                                        width: 150,
-                                        height: 50,
-                                        display: 'block'
-                                    }
-                                });
+                                // console.log("String item:", item);
+                                // newNode.push({ // Append new node info to newNode array
+                                //     id: `func-${functionItem.token}-process-${item}`,
+                                //     type: 'default',
+                                //     data: { label: `${functionItem.token}-process-${item}`}, // Use functionItem.token
+                                //     position: { x: 100 + nodes.length * 100, y: 100 },
+                                //     style: { 
+                                //         backgroundColor: '#dbdbdb',
+                                //         width: 150,
+                                //         height: 50,
+                                //         display: 'block'
+                                //     }
+                                // });
                             } else if ('points_to' in item) { // Assuming isCall is a type guard for Call type
-                                console.log("Variable item:", item);
-                                newNode.push({ // Append new node info to newNode array
-                                    id: `func-${functionItem.token}-Variable-${item.token}`,
-                                    type: 'default',
-                                    data: { label: `${functionItem.token}-Variable-${item.token}`}, // Use functionItem.token
-                                    position: { x: 100 + nodes.length * 100, y: 100 },
-                                    style: { 
-                                        backgroundColor: '#dbdbdb',
-                                        width: 150,
-                                        height: 50,
-                                        display: 'block'
-                                    }
-                                });
+                                // console.log("Variable item:", item);
+                                // newNode.push({ // Append new node info to newNode array
+                                //     id: `func-${functionItem.token}-Variable-${item.token}`,
+                                //     type: 'default',
+                                //     data: { label: `${functionItem.token}-Variable-${item.token}`}, // Use functionItem.token
+                                //     position: { x: 100 + nodes.length * 100, y: 100 },
+                                //     style: { 
+                                //         backgroundColor: '#dbdbdb',
+                                //         width: 150,
+                                //         height: 50,
+                                //         display: 'block'
+                                //     }
+                                // });
                             } else {
                                 console.log("Calls item:", item);
                                 newNode.push({ // Append new node info to newNode array
@@ -80,24 +84,23 @@ export default async function fetchAndCreateNodes(nodes: Node[]) {
                                 
                             }
                         });
-                        
-
-                        // if (process )
-                            // const newNodeId = `func-${process.token}`;
-                            // newNode.push({ // Append new node info to newNode array
-                            //     id: newNodeId,
-                            //     type: 'default',
-                            //     data: { label: process.token }, // Use functionItem.token
-                            //     position: { x: 100 + nodes.length * 100, y: 100 },
-                            //     style: { 
-                            //         backgroundColor: '#dbdbdb',
-                            //         width: 150,
-                            //         height: 50,
-                            //         display: 'block'
-                            //     }
-                            // });
-
                     }
+                }
+                if (item.path) {
+                    console.log("This is the file name:", item.path);
+                    const newNodeId = `file-${item.path}`;
+                    newNode.push({ // Append new node info to newNode array
+                        id: newNodeId,
+                        type: 'file_node',
+                        data: { label: item.path }, // Use functionItem.token
+                        position: { x: 100 + nodes.length * 100, y: 100 },
+                        style: { 
+                            backgroundColor: '#dbdbdb',
+                            width: 150,
+                            height: 50,
+                            display: 'block'
+                        }
+                    });
                 }
             }
         }

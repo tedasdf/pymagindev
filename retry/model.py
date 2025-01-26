@@ -30,6 +30,18 @@ class File():
     def all_symbols(self):
         symbol_list = self.func_list + self.classes_list
         return symbol_list
+    
+    def symbols_dict(self , symbol= None):
+        # if type is all  then all
+
+        symbol_dict = {}
+        for i in self.func_list:
+            if symbol == None or i.token in symbol:
+                symbol_dict[i.token] = i
+        for i in self.classes_list:
+            if symbol == None or i.token in symbol:
+                symbol_dict[i.token] = i
+        return symbol_dict
 
 class UserDefinedClass():
     """
@@ -51,9 +63,11 @@ class UserDefinedClass():
     def assign_attribute(self, attr):
         self.attribute = attr
     
-    def all_symbols(self):
-        #provide useable symbol within the class
-        raise NotImplementedError
+    def all_symbols_dict(self):
+        symbol_dict = {}
+        for i in self.functions:
+            symbol_dict[i.token] = i
+        return symbol_dict
 
 class UserDefinedFunc():
     """
@@ -154,7 +168,7 @@ class Variable():
         self.line_number = line_number
 
     def __repr__(self):
-        return f"Variable token={self.token} point_to={self.points_to} line_no={self.line_number}"
+        return f"<Variable token={self.token} point_to={self.points_to}>"
 
     def has_call(self):
         raise isinstance(self.points_to, Call)

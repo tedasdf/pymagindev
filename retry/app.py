@@ -8,12 +8,36 @@ app = FastAPI()
 
 
 func_group = [
-    FunctionModel(token='search' , parent=('file' , 'test.py'), process=['print("This is the wrong search")']),
-    FunctionModel(token='beta' , parent=('file', 'test.py'), process=['print("this still connects")' , CallModel(func_token = 'search', parent=('function' , 'beta')), 'b = Nothing()\nb.beta()' ]),
-    FunctionModel(token='alpha' , parent=('file', 'test.py'), process=['re.search("hello world")', CallModel(func_token = 'beta', parent=('function' , 'beta')), 'match()' ])
+    FunctionModel(
+        token='search' , 
+        parent=('file' , 'test.py'), 
+        process=[
+            'print("This is the wrong search")'
+        ]),
+    FunctionModel(
+        token='beta' , 
+        parent=('file', 'test.py'), 
+        process=[
+            'print("this still connects")' , 
+            CallModel(func_token = 'search', parent=('function' , 'beta')), 
+            'b = Nothing()\nb.beta()' 
+            ]),
+    FunctionModel(
+        token='alpha' , 
+        parent=('file', 'test.py'), 
+        process=[
+            're.search("hello world")', 
+            CallModel(func_token = 'beta', parent=('function' , 'beta')), 
+            'match()' 
+            ])
 ]
 # In-memory storage
-files_group = {'test.py': FileModel(token='test', path='test.py' , function_list=func_group,  class_list=[])}
+files_group = {'test.py': 
+               FileModel(
+                   token='test', 
+                   path='test.py' , 
+                   function_list=func_group,  
+                   class_list=[])}
 
 
 
@@ -42,12 +66,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# Sample node dictionary
-node_dict = {
-    "1": "btiche",
-    "2": "node2",
-    "3": "node3",
-}
+
 
 # Example endpoint that accepts the FileModel
 @app.post("/file")

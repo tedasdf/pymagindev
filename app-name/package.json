@@ -9,10 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^1.1.4",
+    "@tailwindcss/vite": "^4.0.0",
     "@xyflow/react": "^12.3.6",
+    "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
+    "postcss": "^8.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "reactflow": "^11.11.4",
+    "tailwindcss": "^4.0.0",
     "uuid": "^11.0.3"
   },
   "license": "MIT",

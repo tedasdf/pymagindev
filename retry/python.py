@@ -1,6 +1,8 @@
 import ast
 import logging
 import os
+import sys
+import importlib
 
 from model import (File, UserDefinedFunc , Call, UserDefinedClass,
                     Variable, LogicStatement)
@@ -9,6 +11,29 @@ from model import (File, UserDefinedFunc , Call, UserDefinedClass,
 AstControlType = (ast.If , ast.Try, ast.While, ast.IfExp)
 
 UNKOWN_VAR = 'unknown'
+
+
+def get_relative_path(file_path, level):
+    """
+    Removes the path parts relative to the given level and returns the new path.
+    
+    :param file_path: The original file path
+    :param level: The number of levels to go up (remove that many parts from the path)
+    :return: The new relative path
+    """
+    # Normalize the path (to handle things like . or ..)
+    file_path = os.path.normpath(file_path)
+    
+    # Split the path into parts
+    path_parts = file_path.split(os.sep)
+    
+    # Remove the number of parts specified by the level
+    if level > 0:
+        path_parts = path_parts[:-level]
+
+    return '.'.join(path_parts)
+
+
 
 def djoin(*tup):
     """
@@ -25,11 +50,12 @@ def print_process(processes, i =0):
         print(pro)
         if isinstance(pro, LogicStatement):
             print(pro.condition_type , i)
+            print(pro.condition)
             print_process(pro.process, i )
             if pro.else_branch:
                 print("ELSE:", i)
                 print_process(pro.else_branch, i )
-            print()
+        print()
 
 def extract_calls(value):
     """Recursively extract all calls, attributes, and variables."""
@@ -37,6 +63,8 @@ def extract_calls(value):
     if isinstance(value, ast.BinOp):  # Handle nested binary operations
         calls.extend(extract_calls(value.left))
         calls.extend(extract_calls(value.right))
+    elif isinstance(value, ast.UnaryOp):
+        calls.extend(extract_calls(value.operand))
     elif isinstance(value, ast.Call):  # Handle function calls
         calls.append(get_call_from_func_element(value))
     elif isinstance(value, ast.Attribute):  # Handle attributes like `dict.keys`
@@ -65,7 +93,9 @@ def extract_calls(value):
     elif isinstance(value, ast.IfExp):
         body = extract_calls(value.body)
         orelse = extract_calls(value.orelse)
-        logic_inst = LogicStatement('if' , body , value.lineno , orelse)
+        test = extract_calls(value.test)
+        logic_inst = LogicStatement('ifExp' , test , body , value.lineno , orelse)
+        calls.append(logic_inst)
     else:
         calls.append(f"{type(value).__name__}")
 
@@ -163,12 +193,14 @@ def process_assign(element):
         targets = [element.target]
     else:
         targets = element.targets
+    
+
+    variable_names = []
     for target in targets:
         # Extract all variable names from the target
-        variable_names = extract_targets(target)
-        for token in variable_names:
-            ret.append(Variable(token, calls, element.lineno))
-    return ret
+        variable_names.extend(extract_targets(target))
+  
+    return Variable(variable_names, calls, element.lineno)
 
 
 def make_operations(lines , is_root=False):
@@ -188,7 +220,10 @@ def make_operations(lines , is_root=False):
             cond_type = tree.__class__.__name__.lower()
             subtree = tree.body
             process = make_operations(subtree)
-            logic_inst = LogicStatement(cond_type, process, line_no , else_branch)
+            test = None
+            if not isinstance(tree, ast.Try):
+                test = extract_calls(tree.test)
+            logic_inst = LogicStatement(cond_type,test, process, line_no , else_branch)
             operation.append(logic_inst)
         else:
             if type(tree) == ast.Expr and type(tree.value) == ast.Call:
@@ -378,21 +413,15 @@ class Python():
         """
 
         token = tree.name
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         print("FUNC TOKEN")
         print(token)
         line_number = tree.lineno
         input_list , output_list = make_function_io(tree)
-        print("INPUT LIST")
-        print(input_list)
-        print("OUTPUT LIST")
-        print(output_list)
         processes = make_operations(tree.body)
-        print("AFter process ")
-        print_process(processes)
-        print("After print")
         docstring = ast.get_docstring(tree)
 
-        
+        # print_process(processes)
         # print("PROCESS START ")
         # for pro in processes:
         #     if isinstance(pro, LogicStatement):
@@ -429,7 +458,6 @@ class Python():
             else:
                 class_group.add_function(Python.make_function(node_tree , parent=class_group))
         
-        print(class_group.attribute)
         # NEXT PR NESTED CLASS
         return class_group
 
@@ -437,19 +465,121 @@ class Python():
     def make_root_node(tree):
         return make_operations(tree, True), make_constant(tree)
 
+
+
     @staticmethod
-    def make_import(trees):
-        import_list = []
+    def new_resolve_import(import_inst, base_dir):
+        if type(import_inst) == dict:
+            import_path = import_inst.keys()
+            if import_path == None:
+                return False
+            # Split the import into its parts
+            path_parts = import_path.split('.')
+            
+            # Start from the base directory (repo root)
+            current_path = base_dir
+            print("Base directory:", current_path)
+            
+            # Try to resolve the path progressively
+            partial_path = '.\\'
+            for i in path_parts:
+                partial_path = os.path.join(partial_path ,i)
+                print(partial_path)
+                if partial_path in current_path or partial_path == current_path:
+                    continue
+                elif current_path in partial_path:
+                    print(partial_path)
+                    if os.path.isdir(partial_path):
+                        continue
+                    else:
+                        return False
+                else:
+                    partial_path = os.path.join(current_path,partial_path)
+            
+            return True
+        raise NotImplementedError
     
+    @staticmethod
+    def resolve_import_path(import_path, base_dir):
+        """
+        Resolves an import path by iterating over the path parts and checking for valid directories.
+        If the path is not found, starts from the base directory and appends until a valid directory is found.
+        """
+        if import_path == None:
+            return False
+        # Split the import into its parts
+        path_parts = import_path.split('.')
+        
+        # Start from the base directory (repo root)
+        current_path = base_dir
+        print("Base directory:", current_path)
+        
+        # Try to resolve the path progressively
+        partial_path = '.\\'
+        for i in path_parts:
+            partial_path = os.path.join(partial_path ,i)
+            if partial_path in current_path or partial_path == current_path:
+                print(1)
+                continue
+            elif current_path in partial_path:
+                print(2)
+                print("Before cjheck", partial_path)
+                if os.path.isdir(partial_path):
+                    continue
+                else:
+                    return False
+            else:
+                print(3)
+                partial_path = partial_path.lstrip('.\\')
+                partial_path = os.path.join(current_path,partial_path)
+        print("Finsih path",partial_path)
+        if os.path.isdir(partial_path):
+            return True
+        else:
+            partial_path += '.py'
+            if os.path.exists(partial_path):
+                return True
+        return False
+        
+    
+    @staticmethod
+    def make_import(trees, file_path, raw_source_path):
+        import_list = []
+
         for import_tree in trees:
             if isinstance(import_tree, ast.ImportFrom):
-                # only importing from the same repo matters so no need to have import 
-                # first filter
-                for alias in import_tree.names:
-                    import_list.append({
-                        'from': import_tree.module, 
-                        'function': alias.name, 
-                        'as': alias.asname
-                    })
+                # Handle 'from ... import ...' imports
+                # print("AST TREE")
+                # print(ast.dump(import_tree , indent=4))
+                from_inst = import_tree.module
+                level = import_tree.level
+                if level != 0:
+                    if from_inst == None:
+                        from_inst = ''
+                    from_inst = '.'.join([get_relative_path(file_path, level), from_inst])
+                print(from_inst)
+                names_list = [
+                    (alias.name, alias.asname) if alias.asname else alias.name
+                    for alias in import_tree.names
+                ]
+                # Append the import directly
+
+                if Python.resolve_import_path(from_inst , raw_source_path): # only path check , not detailed enough
+                    print("THIS IS APPEND IN IMPORT LIST")
+                    print(from_inst)
+                    import_list.append({from_inst: names_list})
+            
+            elif isinstance(import_tree, ast.Import):
+                # Handle 'import ...' imports
+                names_list = [
+                    (alias.name, alias.asname) if alias.asname else alias.name
+                    for alias in import_tree.names
+                ]
+                # Append the import directly
+                temp_list = []
+                for i in names_list:
+                    if Python.resolve_import_path(i , raw_source_path): # only path check , not detailed enough
+                        temp_list.append(names_list)
+                import_list.append(temp_list)
         
         return import_list

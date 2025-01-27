@@ -7,6 +7,8 @@ import FileNode from '../components/node/nodeType/FileNode';
 import ConstantNode from '../components/node/nodeType/ConstantNode';
 import LogicStatNode from '../components/node/nodeType/LogicStatNode';
 import CallNode from '../components/node/nodeType/CallNode';
+import VariableNode from '../components/node/nodeType/VariableNode';
+import ProcessFunctionNode from '../components/node/nodeType/ProcessFunctionNode';
 
 export const initialNodes = [
   {
@@ -35,6 +37,15 @@ export const initialNodes = [
     draggable: true,
   },
   {
+    id:'variable',
+    type:'variableNode',
+    position: {x: 100, y:150},
+    data:{
+      name: 'fewshots',
+
+    }
+  },
+  {
     id:'function-error',
     type:'callNode',
     position: { x: 0 , y : 50},
@@ -44,6 +55,38 @@ export const initialNodes = [
     style:{
       width: '10px', // small rectangle width
       height: '5px', // small rectangle height
+    }
+  },
+  {
+    id:'function-generate',
+    tyoe:'processFunctionNode',
+    position: {x: 300, y: 0},
+    data:{
+      name: 'generate',
+      input: [
+        'self' , 
+        'question' , 
+        'key' , 
+        'examples',
+        'prompt',
+        'summary_prompt',
+        'meta_summary_prompt',
+        'additional_keys',
+        'meta_summart_additional_keys',
+        'fewshot_type',
+        'summary_system',
+        'meta_summary_system',
+        'quadrant',
+        'patience',
+        'reset'
+      ],
+      output: [
+        'out'
+      ]
+    },
+    style: {
+      width: 250,
+      height: 250
     }
   },
   // {
@@ -141,7 +184,9 @@ export const nodeTypes = {
   'fileNode': FileNode,
   'constantNode': ConstantNode,
   'logicstateNode': LogicStatNode,
-  'callNode': CallNode
+  'callNode': CallNode,
+  'variableNode': VariableNode,
+  'processFunctionNode': ProcessFunctionNode
   // Add any of your custom nodes here!
 } satisfies NodeTypes;
 

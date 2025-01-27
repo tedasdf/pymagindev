@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { NodeTag } from "./NodeTag";
 
-const ConstantNode = ({ data }) => {
+const ConstantNode = ({ data }:{ data: { name: string } }) => {
     return (
         <div
             key={data.name}

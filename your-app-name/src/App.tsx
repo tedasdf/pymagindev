@@ -8,14 +8,17 @@ import {
   useNodesState,
   useEdgesState,
   type OnConnect,
+  useReactFlow,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 
 import { initialNodes, nodeTypes } from './nodes';
 import { initialEdges, edgeTypes } from './edges';
+import React from 'react';
 
 export default function App() {
+  const reactFlowInstance = useReactFlow();
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 

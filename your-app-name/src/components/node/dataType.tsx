@@ -18,7 +18,7 @@ export interface IClass{
 
 export interface IFunction {
     name: string;
-    proces?: (Variable | Call | LogicStatement)[];
+    process?: (Variable | Call | LogicStatement)[];
     input?: string[];
     output?: string[];
 }
@@ -30,10 +30,11 @@ export interface LogicStatement {
     branch: number;
 }
 
-interface Variable {
+export interface Variable {
     type: "variable";
     name: string; // example of a variable having a name
-    value?: any; // optional value for the variable
+    input?: any; // optional value for the variable
+
 }
 
 export interface Call {

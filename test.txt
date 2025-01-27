@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 
 (pymag) C:\Users\teeds\Desktop\projects\pymagindev\retry>python main.py ./test/test_example10/test.py
 =================================================================================================
@@ -111,3 +112,84 @@ FILE KEY
 ./test/test_example10/test.py
 FILE SYMBOL
       <model.File object at 0x000002A90FFE9A50>
+=======
+def generate(
+        self,
+        question: str,
+        key: str,
+        examples: str = "",
+        prompt: str = "",
+        summary_prompt: str = "",
+        meta_summary_prompt: str = "",
+        additional_keys: Dict[str, str] = {},
+        summary_additional_keys: Dict[str, str] = {},
+        meta_summary_additional_keys: Dict[str, str] = {},
+        fewshot_type: str = "",
+        summary_system: str = "",
+        meta_summary_system: str = "",
+        quadrant: str = "adapt",
+        patience: int = 3,
+        reset: bool = False,
+    ) -> CLINOutput:
+        """Generate a response to a given question.
+
+        Args:
+            question (str): The question to be answered.
+            key (str): The key for the question.
+            examples (str): The examples for the question. Defaults to "".
+            prompt (str): The prompt for the question. Defaults to "".
+            summary_prompt (str): The summary prompt for the question. Defaults to "".
+            meta_summary_prompt (str): The meta-summary prompt for the question. Defaults to "".
+            additional_keys (Dict[str, str]): Additional keys for the question. Defaults to {}.
+            summary_additional_keys (Dict[str, str]): Additional keys for the summary. Defaults to {}.
+            meta_summary_additional_keys (Dict[str, str]): Additional keys for the meta-summary. Defaults to {}.
+            fewshot_type (str): The type of few-shot examples to use. Defaults to "".
+            summary_system (str): The system for the summary. Defaults to "".
+            meta_summary_system (str): The system for the meta-summary. Defaults to "".
+            quadrant (str): The quadrant for the question. Defaults to "adapt".
+            patience (int): The patience for the question. Defaults to 3.
+            reset (bool): Whether to reset the agent. Defaults to False.
+
+        Returns:
+                CLINOutput: The output of the agent.
+        """
+        if quadrant not in ["adapt", "gen_env", "gen_task"]:
+            raise ValueError(f"Quadrant '{quadrant}' not supported for CLIN.")
+
+        if not prompt or not summary_prompt or not meta_summary_prompt or not examples:
+            if not fewshot_type:
+                fewshot_type = CLIN_BENCHMARK_FEWSHOTS[self.benchmark][0]  # type: ignore
+            fewshots = CLIN.get_fewshots(
+                benchmark=self.benchmark, fewshot_type=fewshot_type
+            )
+            prompts = CLIN.get_prompts(benchmark=self.benchmark)
+            examples = fewshots["examples"]
+            prompt = prompts["prompt"]
+            summary_prompt = prompts["summary_prompt"]
+            meta_summary_prompt = prompts["meta_summary_prompt"]
+
+        if not summary_system:
+            summary_system = CLIN_SUMMARY_SYSTEM[quadrant]
+
+        if not meta_summary_system:
+            meta_summary_system = CLIN_META_SUMMARY_SYSTEM[quadrant]
+
+        out = self.strategy.generate(
+            question=question,
+            key=key,
+            examples=examples,
+            prompt=prompt,
+            summary_prompt=summary_prompt,
+            meta_summary_prompt=meta_summary_prompt,
+            additional_keys=additional_keys,
+            summary_additional_keys=summary_additional_keys,
+            meta_summary_additional_keys=meta_summary_additional_keys,
+            summary_system=summary_system,
+            meta_summary_system=meta_summary_system,
+            quadrant=quadrant,
+            patience=patience,
+            reset=reset,
+        )
+
+        return out
+>>>>>>> Stashed changes

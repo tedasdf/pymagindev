@@ -27,16 +27,6 @@ export const initialNodes = [
     }
   },
   {
-    id:'function-Logic',
-    type:'logicstateNode',
-    position:{x : 100 , y: 100},
-    data: {
-      type: 'if',
-      branch: 3
-    },
-    draggable: true,
-  },
-  {
     id:'variable',
     type:'variableNode',
     position: {x: 100, y:150},
@@ -59,7 +49,7 @@ export const initialNodes = [
   },
   {
     id:'function-generate',
-    tyoe:'processFunctionNode',
+    type:'processFunctionNode',
     position: {x: 300, y: 0},
     data:{
       name: 'generate',
@@ -84,11 +74,97 @@ export const initialNodes = [
         'out'
       ]
     },
+    isConnectable: true,
     style: {
       width: 250,
       height: 250
     }
   },
+  {
+    id:'quadrant',
+    type:'variableNode',
+    position: {x: 100, y:150},
+    data:{
+      name: 'fewshots',
+
+    }
+  },
+  {
+    id:'function-Logic1',
+    type:'logicstateNode',
+    position:{x : 100 , y: 100},
+    data: {
+      type: 'if',
+      branch: 1
+    },
+    draggable: true,
+  },
+  {
+    id:'prompt',
+    type:'variableNode',
+    position: {x: 100, y:150},
+    data:{
+      name: 'fewshots',
+
+    }
+  },
+  {
+    id:'summary_prompt',
+    type:'variableNode',
+    position: {x: 100, y:150},
+    data:{
+      name: 'fewshots',
+
+    }
+  },
+  {
+    id:'meta_summary_prompt',
+    type:'variableNode',
+    position: {x: 100, y:150},
+    data:{
+      name: 'fewshots',
+
+    }
+  },
+  {
+    id:'examples',
+    type:'variableNode',
+    position: {x: 100, y:150},
+    data:{
+      name: 'fewshots',
+
+    }
+  },
+  {
+    id:'function-Logic2',
+    type:'logicstateNode',
+    position:{x : 100 , y: 100},
+    data: {
+      type: 'if',
+      branch: 1
+    },
+    draggable: true,
+  },
+  {
+    id:'fewshot_type',
+    type:'variableNode',
+    position: {x: 100, y:150},
+    data:{
+      name: 'fewshots',
+
+    }
+  },
+  {
+    id:'function-Logic3',
+    type:'logicstateNode',
+    position:{x : 100 , y: 100},
+    data: {
+      type: 'if',
+      branch: 1
+    },
+    draggable: true,
+  },
+  
   // {
   //   id: '1' , 
   //   type: 'constantNode', 

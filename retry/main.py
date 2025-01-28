@@ -112,45 +112,53 @@ UNKNOWN_FUNC = 'unknown_func'
 
 
 
-def check_file_reference(instes , parent , global_symbol , local_symbol):
+def check_file_reference(inst , parent , global_symbol , local_symbol):
     
-    for inst in  instes:
-        # print("FOR LOOPING INSTS")
-        if not isinstance(inst, Call):
-            continue
-        checking_token = inst.func
-        parent_token = inst.parent_token
-        # print(inst)
-        # print(checking_token)
-        if isinstance(parent, UserDefinedClass) and parent_token == 'self':
-            # If it's a method call inside a class (via 'self')
-            key = find_match(list(local_symbol.keys()),checking_token)
-            if key:
-                inst.func = local_symbol[key]
-                # print("CHECK_FILE_REFRENCE FirST IF")
-                # print(type(inst.func))
-            else:
-                inst.func = UNKNOWN_FUNC
-                # print("Self and not in class need to check inherit")
-        elif isinstance(parent, UserDefinedClass) and parent_token != 'self':
-            # If it's a method call via an instance (like 'a.test()')
-            # You need to get the class name of the instance `a` and combine it with the method name
-            key = find_match(list(global_symbol.keys()),checking_token)
-            if key:
-                inst.func = global_symbol[key]
-            else:
-                inst.func = UNKNOWN_FUNC
-                # highly likely so that it is not 
-        elif parent_token != None:
-            ### TODO
-            # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
-            checking_token = parent_token + checking_token
-        else: # this is for pure function inside a file not in class 
-            key = find_match(list(global_symbol.keys()),checking_token)
-            if key:
-                inst.func = global_symbol[key]
-            else:
-                inst.func = UNKNOWN_FUNC
+    # for inst in  instes:
+    # print("FOR LOOPING INSTS")
+    if not isinstance(inst, Call):
+        return
+    checking_token = inst.func
+    parent_token = inst.parent_token
+    # print(inst)
+    # print(checking_token)
+    if isinstance(parent, UserDefinedClass) and parent_token == 'self':
+        # If it's a method call inside a class (via 'self')
+        key = find_match(list(local_symbol.keys()),checking_token)
+        if key:
+            inst.func = local_symbol[key]
+            return CallModel(
+                func_token=inst.func, 
+                parent=parent.token,
+                input=inst.taken_var
+                )
+        else:
+            inst.func = UNKNOWN_FUNC
+            print("Self and not in class need to check inherit")
+    elif isinstance(parent, UserDefinedClass) and parent_token != 'self':
+        # If it's a method call via an instance (like 'a.test()')
+        # You need to get the class name of the instance `a` and combine it with the method name
+        key = find_match(list(global_symbol.keys()),checking_token)
+        if key:
+            inst.func = global_symbol[key]
+            return CallModel(
+                func_token= key,
+                parent=parent.token,
+                input=inst.taken_var
+            )
+        else:
+            inst.func = UNKNOWN_FUNC
+            # highly likely so that it is not 
+    elif parent_token != None:
+        ### TODO
+        # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
+        checking_token = parent_token + checking_token
+    else: # this is for pure function inside a file not in class 
+        key = find_match(list(global_symbol.keys()),checking_token)
+        if key:
+            inst.func = global_symbol[key]
+        else:
+            inst.func = UNKNOWN_FUNC
 
             # if the function is a symbol wihtin the file , it will be referecne to the corresponding symbol
             # if the function is a symbol within the class, it will also be refenced 
@@ -163,7 +171,7 @@ def check_process(processes, parent, local_symbol , global_symbol):
     for pro in processes:
         if isinstance(pro, Call):
             # print("CALL:")
-            check_file_reference([pro] , parent, global_symbol , local_symbol)
+            check_file_reference(pro , parent, global_symbol , local_symbol)
         elif isinstance(pro, Variable):
             # print("VARIABLE:")
             check_file_reference(pro.points_to , parent, global_symbol , local_symbol)
@@ -174,6 +182,7 @@ def check_process(processes, parent, local_symbol , global_symbol):
             if pro.else_branch:
                 check_process(pro.else_branch, parent, local_symbol , global_symbol )
         # print()
+
 
 def main(sys_argv=None):
     """

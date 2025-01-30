@@ -1,45 +1,13 @@
+from typing import Dict
 from fastapi import FastAPI
 from db.main1 import FileModel, FunctionModel , CallModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from main import pymag
 # Create FastAPI app
 app = FastAPI()
 
-
-func_group = [
-    FunctionModel(
-        token='search' , 
-        parent=('file' , 'test.py'), 
-        process=[
-            'print("This is the wrong search")'
-        ]),
-    FunctionModel(
-        token='beta' , 
-        parent=('file', 'test.py'), 
-        process=[
-            'print("this still connects")' , 
-            CallModel(func_token = 'search', parent=('function' , 'beta')), 
-            'b = Nothing()\nb.beta()' 
-            ]),
-    FunctionModel(
-        token='alpha' , 
-        parent=('file', 'test.py'), 
-        process=[
-            're.search("hello world")', 
-            CallModel(func_token = 'beta', parent=('function' , 'beta')), 
-            'match()' 
-            ])
-]
-# In-memory storage
-files_group = {'test.py': 
-               FileModel(
-                   token='test', 
-                   path='test.py' , 
-                   function_list=func_group,  
-                   class_list=[])}
-
-
+files_group: Dict[str, FileModel] = {}
 
 # @app.post("/file")
 # async def post_file(source_path: str, file_group: FileModel):
@@ -67,22 +35,28 @@ app.add_middleware(
 )
 
 
+@app.post('/file/{file_path}')
+async def upload_file_path(file_path):
+    files = pymag(file_path)
+    files_group[files.token] = files
+    return files_group
 
 # Example endpoint that accepts the FileModel
 @app.post("/file")
 async def upload_file(file: FileModel):
     # For now, just return the received file data
     files_group[file.token] = file
-    return {"received_file": file.dict()}
+    return files_group
 
-# Example endpoint that accepts the FileModel
-@app.get("/file")
-async def get_file():
-    # For now, just return the received file data
-    
-    return [files_group['test.py']]
+@app.get("/file/{token}")
+async def get_file(token: str):
+    if token in files_group:
+        return {"file": files_group[token]}
+    return {"error": "File not found"}
 
-
+@app.get('/file_key')
+async def get_file_keys():
+    return files_group.keys()
 
 # @app.get("/file")
 # async def get_file(source_path: str):

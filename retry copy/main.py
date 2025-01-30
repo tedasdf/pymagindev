@@ -6,7 +6,7 @@ import asyncio
 
 from python import Python
 from model import Call, File, LogicStatement, UserDefinedClass, Variable, UserDefinedFunc
-from db.main1 import CallModel, FunctionModel, VariableModel
+from db.main1 import CallModel, FileModel, FunctionModel, VariableModel
 from utils import find_match
 # from db.main import CallModel, FileModel, FunctionModel, VariableModel
 
@@ -286,22 +286,14 @@ def check_process(processes, file_symbol_dict):
 
 
 
-def main(sys_argv=None):
+def pymag(sources):
     """
     CLI interface. Sys_argv is a parameter for the sake of unittest coverage.
     :param sys_argv list:
     :rtype: None
     """
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument(
-        'sources', metavar='sources', nargs='+',
-        help='source code file/directory paths.')
 
-    sys_argv = sys_argv or sys.argv[1:]
-    args = parser.parse_args(sys_argv)
-
-    raw_source_paths=args.sources
+    raw_source_paths=sources
 
     if not isinstance(raw_source_paths, list):
         raw_source_paths = [raw_source_paths]
@@ -322,8 +314,8 @@ def main(sys_argv=None):
         file_group[str(source)] = make_file_group(file_ast_tree, source,raw_source_paths)
 
 
-
-    for _ , file_inst in file_group.items():
+    file_db = {}
+    for file_key , file_inst in file_group.items():
         file_symbol_dict = file_inst.symbols_dict()
         for import_inst in file_inst.imported_list:
             if type(import_inst) == dict:
@@ -333,35 +325,44 @@ def main(sys_argv=None):
                 file_import_symbol_dict = file_import.symbols_dict(import_inst[key])
                 file_symbol_dict = {**file_symbol_dict, **file_import_symbol_dict}
 
-            func_instes = file_inst.func_list
+        func_instes = file_inst.func_list
 
-            func_list = []
-            for func_inst in func_instes:
-                
-                process_db_list = check_process(func_inst.process , file_symbol_dict)    
-                func_list.append(
-                    FunctionModel(
-                        token=func_inst.token,
-                        parent=file_inst.token,
-                        process=process_db_list
-                    )
+        func_list = []
+        for func_inst in func_instes:
+            
+            process_db_list = check_process(func_inst.process , file_symbol_dict)    
+            func_list.append(
+                FunctionModel(
+                    token=func_inst.token,
+                    parent=('file',file_inst.token),
+                    process=process_db_list
                 )
+            )
+        file_db_inst = FileModel(
+            token=file_inst.token,
+            path=file_inst.file_path,
+            function_list=func_list,
+        )
+    
+        file_db[file_key] = file_db_inst
 
 
 
 
 
 
-            classes_instes = file_inst.classes_list
-            # in file symbol 
+
+            # classes_instes = file_inst.classes_list
+            # # in file symbol 
 
 
-            for class_inst in classes_instes:
-                class_symbol = class_inst.all_symbols_dict()
-                for func in class_inst.functions:
-                    check_process(func.process)
+            # for class_inst in classes_instes:
+            #     class_symbol = class_inst.all_symbols_dict()
+            #     for func in class_inst.functions:
+            #         check_process(func.process)
 
+    return file_db_inst
 
 
 if __name__ == "__main__":
-    main()
+    pymag('.\\test\\test_example10\\functional.py')

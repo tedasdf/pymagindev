@@ -360,7 +360,7 @@ def pymag(sources):
             #     class_symbol = class_inst.all_symbols_dict()
             #     for func in class_inst.functions:
             #         check_process(func.process)
-
+    print("GELLO")
     return file_db_inst
 
 

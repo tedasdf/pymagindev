@@ -6,9 +6,12 @@ import asyncio
 
 from python import Python
 from model import Call, File, LogicStatement, UserDefinedClass, Variable, UserDefinedFunc
-from db.main1 import CallModel
+from db.main1 import CallModel, VariableModel
 from utils import find_match
 # from db.main import CallModel, FileModel, FunctionModel, VariableModel
+
+UNKNOWN_FUNC = 'unknown_func'
+
 
 
 language = Python()
@@ -107,81 +110,119 @@ def make_file_group(tree, file_path, raw_source_paths):
     # print("=================================================================================================")
     return file_inst
 
-UNKNOWN_FUNC = 'unknown_func'
 
 
 
 
-def check_file_reference(inst , parent , global_symbol , local_symbol):
+
+def check_file_reference(instes , parent , global_symbol , local_symbol):
     
-    # for inst in  instes:
-    # print("FOR LOOPING INSTS")
-    if not isinstance(inst, Call):
-        return
-    checking_token = inst.func
-    parent_token = inst.parent_token
-    # print(inst)
-    # print(checking_token)
-    if isinstance(parent, UserDefinedClass) and parent_token == 'self':
-        # If it's a method call inside a class (via 'self')
-        key = find_match(list(local_symbol.keys()),checking_token)
-        if key:
-            inst.func = local_symbol[key]
-            return CallModel(
-                func_token=inst.func, 
-                parent=parent.token,
-                input=inst.taken_var
-                )
-        else:
-            inst.func = UNKNOWN_FUNC
-            print("Self and not in class need to check inherit")
-    elif isinstance(parent, UserDefinedClass) and parent_token != 'self':
-        # If it's a method call via an instance (like 'a.test()')
-        # You need to get the class name of the instance `a` and combine it with the method name
-        key = find_match(list(global_symbol.keys()),checking_token)
-        if key:
-            inst.func = global_symbol[key]
-            return CallModel(
-                func_token= key,
-                parent=parent.token,
-                input=inst.taken_var
-            )
-        else:
-            inst.func = UNKNOWN_FUNC
-            # highly likely so that it is not 
-    elif parent_token != None:
-        ### TODO
-        # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
-        checking_token = parent_token + checking_token
-    else: # this is for pure function inside a file not in class 
-        key = find_match(list(global_symbol.keys()),checking_token)
-        if key:
-            inst.func = global_symbol[key]
-        else:
-            inst.func = UNKNOWN_FUNC
+    inst_db = []
 
-            # if the function is a symbol wihtin the file , it will be referecne to the corresponding symbol
-            # if the function is a symbol within the class, it will also be refenced 
-            # if the function is a function from some other library:
-                # if the function has no variable inpit , it is regarded as a constant 
-                # ifthe function is a function with variable input  it is consider as f(variable 1, variable2, varaible3 , .....)
+    for inst in  instes:
 
+        if not isinstance(inst, Call):
+            
+            continue
+
+        checking_token = inst.func
+        parent_token = inst.parent_token
+       
+
+        # This is an if statemnt for self.something function
+        if isinstance(parent, UserDefinedClass) and parent_token == 'self':
+            # If it's a method call inside a class (via 'self')
+            key = find_match(list(local_symbol.keys()),checking_token)
+            if key:
+                inst.func = local_symbol[key]
+                inst_db.append(CallModel(
+                    func_token=checking_token,
+                    inputs=inst.taken_var
+                ))
+            else:
+                inst.func = UNKNOWN_FUNC
+                print("Self and not in class need to check inherit")
+                
+        elif isinstance(parent, UserDefinedClass) and parent_token != 'self':
+            # If it's a method call via an instance (like 'a.test()')
+            # You need to get the class name of the instance `a` and combine it with the method name
+            key = find_match(list(global_symbol.keys()),checking_token)
+            if key:
+                inst.func = global_symbol[key]
+            else:
+                inst.func = UNKNOWN_FUNC
+                if len(inst.taken_var) == 0:
+                    inst_db.append(
+                        "constant"
+                    )
+                else:
+                    inst_db.append(
+                        CallModel(
+                            func_token=UNKNOWN_FUNC,
+                            inputs=inst.taken_var
+                        )
+                    )
+                # highly likely so that it is not 
+        elif parent_token != None:
+            ### TODO
+            # outside of class call function .parent_token need to reference to the other original or the actual initalise reference which i had yet figure out 
+            checking_token = parent_token + checking_token
+        else: # this is for pure function inside a file not in class 
+            key = find_match(list(global_symbol.keys()),checking_token)
+            if key:
+                inst.func = global_symbol[key]
+            else:
+                inst.func = UNKNOWN_FUNC
+    return inst_db
 
 def check_process(processes, parent, local_symbol , global_symbol):
+    
+    db_list = []
+    varaiable = {}
+
     for pro in processes:
         if isinstance(pro, Call):
-            # print("CALL:")
-            check_file_reference(pro , parent, global_symbol , local_symbol)
+            print("CALL:")
+            print(pro)
+            for idx, i in enumerate(pro.taken_var):
+                if isinstance(i, Call):
+                    print("CALL:")
+                    print(pro)
+                    call_inst = CallModel(
+                        func_token=i.func,
+                        inputs=i.taken_var
+                    )
+                    print(call_inst)
+                    var_name = f"input{idx}_{pro.func}{pro.line_number}"
+                    db_list.append(
+                        VariableModel(
+                            token=[var_name],
+                            points_to=[call_inst]
+                        )
+                    )
+                    pro.taken_var[idx] = var_name
+                    print(pro)
+                
+            db_sub_list = check_file_reference([pro] , parent, global_symbol , local_symbol)
+
         elif isinstance(pro, Variable):
             # print("VARIABLE:")
-            check_file_reference(pro.points_to , parent, global_symbol , local_symbol)
+            print("Variable:", pro.token)
+            print(pro)
+            db_sub_list =check_file_reference(pro.points_to , parent, global_symbol , local_symbol)
+            db_inst = VariableModel(
+                token=pro.token,
+                points_to=db_sub_list
+            )
+            db_list.append(db_inst)
         if isinstance(pro, LogicStatement):
             # print(pro.condition_type)
             check_process(pro.condition, parent, local_symbol , global_symbol )
             check_process(pro.process, parent, local_symbol , global_symbol )
             if pro.else_branch:
                 check_process(pro.else_branch, parent, local_symbol , global_symbol )
-        # print()
+    print(db_list)
+    return
 
 
 def main(sys_argv=None):
@@ -234,7 +275,9 @@ def main(sys_argv=None):
                 file_import = file_group[key]
                 file_import_symbol_dict = file_import.symbols_dict(import_inst[key])
                 file_symbol_dict = {**file_symbol_dict, **file_import_symbol_dict}
-        # out of file import symbol
+
+
+
         for class_inst in classes_int:
             class_symbol = class_inst.all_symbols_dict()
 
@@ -244,18 +287,18 @@ def main(sys_argv=None):
                 # print("OUTPUT", func.output_list)
                 # print("------------------------------")
     
-    for file_key , file_inst in file_group.items():
+    # for file_key , file_inst in file_group.items():
 
-        for class_inst in classes_int:
+    #     for class_inst in classes_int:
             
-            for func in class_inst.functions:
+    #         for func in class_inst.functions:
                 
-                for proc in func.process:
-                    print(proc)
-                    if isinstance(proc, Call) and proc.func != UNKNOWN_FUNC:
-                        inst = CallModel(proc)
-                        print(inst)
-    ######################################################  
+    #             for proc in func.process:
+    #                 print(proc)
+    #                 if isinstance(proc, Call) and proc.func != UNKNOWN_FUNC:
+    #                     inst = CallModel(proc)
+    #                     print(inst)
+    # ######################################################  
     # for file_key, file_symbol in file_group.items():
     #     file_symbol = file_symbol.all_symbols()
     #     for func in file_symbol.all_symbols():

@@ -34,7 +34,6 @@ def get_relative_path(file_path, level):
     return '.'.join(path_parts)
 
 
-
 def djoin(*tup):
     """
     Convenience method to join strings with dots
@@ -44,18 +43,6 @@ def djoin(*tup):
         return '.'.join(tup[0])
     return '.'.join(tup)
 
-# def print_process(processes, i =0):
-#     i += 1
-#     for pro in processes:
-#         print(pro)
-#         if isinstance(pro, LogicStatement):
-#             print(pro.condition_type , i)
-#             print(pro.condition)
-#             print_process(pro.process, i )
-#             if pro.else_branch:
-#                 print("ELSE:", i)
-#                 print_process(pro.else_branch, i )
-#         print()
 
 def extract_calls(value):
     """Recursively extract all calls, attributes, and variables."""
@@ -416,17 +403,6 @@ class Python():
         input_list , output_list = make_function_io(tree)
         processes = make_operations(tree.body)
         docstring = ast.get_docstring(tree)
-
-        # print_process(processes)
-        # print("PROCESS START ")
-        # for pro in processes:
-        #     if isinstance(pro, LogicStatement):
-        #         print(pro)
-        #         for i in pro.process:
-        #             print(i)
-        #     else:
-        #         print(pro)
-        # print("PROCESS END")
 
         return UserDefinedFunc(
             token, 

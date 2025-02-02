@@ -56,7 +56,7 @@ async def get_file(token: str):
 
 @app.get('/file_key')
 async def get_file_keys():
-    return files_group.keys()
+    return {"filekeys":files_group.keys()}
 
 # @app.get("/file")
 # async def get_file(source_path: str):
@@ -71,12 +71,12 @@ async def get_file_keys():
 
 
 
-@app.get('/nodes')
-async def get_all_nodes():
-    # Return all the nodes in the dictionary
-    return node_dict
+# @app.get('/nodes')
+# async def get_all_nodes():
+#     # Return all the nodes in the dictionary
+#     return node_dict
 
-@app.post('/node')
-async def post_node(id, node):
-    node_dict[id] = node
-    return "succes"
+# @app.post('/node')
+# async def post_node(id, node):
+#     node_dict[id] = node
+#     return "succes"

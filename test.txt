@@ -1,458 +1,256 @@
-[
-    {
-        "id": "traces",
-        "type": "parentNodeType",
-        "position": {
-            "x": 0,
-            "y": 0
-        },
-        "data": {
-            "label": "traces",
-            "parentNode": "traces",
-            "width": 630,
-            "height": 170,
-            "type": "parentNodeType",
-            "childNodes": [
-                {
-                    "id": "traces-Receiver-receiverNode-otlp",
-                    "parentNode": "traces",
-                    "extent": "parent",
-                    "type": "receiversNode",
-                    "position": {
-                        "x": 50,
-                        "y": 65
+{
+    "file": {
+        "token": "..test.test_example10.functional",
+        "path": ".\\\\test\\\\test_example10\\\\functional.py",
+        "function_list": [
+            {
+                "token": "_build_agent_prompt",
+                "parent": [
+                    "file",
+                    "..test.test_example10.functional"
+                ],
+                "process": [
+                    {
+                        "token": [
+                            "prompt"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "unknown_func",
+                                "inputs": [
+                                    "question",
+                                    "scratchpad",
+                                    "examples",
+                                    "max_steps",
+                                    "additional_keys"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "token": "_prompt_agent",
+                "parent": [
+                    "file",
+                    "..test.test_example10.functional"
+                ],
+                "process": [
+                    {
+                        "token": [
+                            "prompt"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "_build_agent_prompt",
+                                "inputs": [
+                                    "question",
+                                    "scratchpad",
+                                    "examples",
+                                    "max_steps",
+                                    "prompt",
+                                    "additional_keys"
+                                ]
+                            }
+                        ]
                     },
-                    "data": {
-                        "label": "otlp",
-                        "parentNode": "traces",
-                        "type": "receivers",
-                        "height": 80,
-                        "id": "traces-Receiver-receiverNode-otlp",
-                        "position": {
-                            "x": 50,
-                            "y": 65
-                        }
+                    {
+                        "token": [
+                            "out"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "unknown_func",
+                                "inputs": [
+                                    "prompt"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "token": "_is_halted",
+                "parent": [
+                    "file",
+                    "..test.test_example10.functional"
+                ],
+                "process": [
+                    {
+                        "token": [
+                            "over_max_steps"
+                        ],
+                        "points_to": []
                     },
-                    "draggable": false
-                },
-                {
-                    "id": "traces-Processor-processorNode-batch",
-                    "parentNode": "traces",
-                    "extent": "parent",
-                    "type": "processorsNode",
-                    "position": {
-                        "x": 250,
-                        "y": 65
+                    {
+                        "token": [
+                            "over_token_limit"
+                        ],
+                        "points_to": []
+                    }
+                ]
+            },
+            {
+                "token": "parse_qa_action",
+                "parent": [
+                    "file",
+                    "..test.test_example10.functional"
+                ],
+                "process": [
+                    {
+                        "token": [
+                            "pattern"
+                        ],
+                        "points_to": []
                     },
-                    "data": {
-                        "label": "batch",
-                        "parentNode": "traces",
-                        "type": "processors",
-                        "height": 80,
-                        "id": "traces-Processor-processorNode-batch",
-                        "position": {
-                            "x": 250,
-                            "y": 65
-                        }
+                    {
+                        "token": [
+                            "match"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "unknown_func",
+                                "inputs": [
+                                    "pattern",
+                                    "string"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "token": "parse_math_action",
+                "parent": [
+                    "file",
+                    "..test.test_example10.functional"
+                ],
+                "process": [
+                    {
+                        "token": [
+                            "action_split"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "unknown_func",
+                                "inputs": []
+                            }
+                        ]
                     },
-                    "draggable": false
-                },
-                {
-                    "id": "traces-exporter-exporterNode-otlp",
-                    "parentNode": "traces",
-                    "extent": "parent",
-                    "type": "exportersNode",
-                    "position": {
-                        "x": 460,
-                        "y": 65
+                    {
+                        "token": [
+                            "match"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "unknown_func",
+                                "inputs": [
+                                    "action_split",
+                                    "re.IGNORECASE"
+                                ]
+                            }
+                        ]
                     },
-                    "data": {
-                        "label": "otlp",
-                        "parentNode": "traces",
-                        "type": "exporters",
-                        "height": 80,
-                        "id": "traces-exporter-exporterNode-otlp",
-                        "position": {
-                            "x": 460,
-                            "y": 65
-                        }
+                    {
+                        "token": [
+                            "action_type"
+                        ],
+                        "points_to": []
+                    }
+                ]
+            },
+            {
+                "token": "parse_code_action",
+                "parent": [
+                    "file",
+                    "..test.test_example10.functional"
+                ],
+                "process": [
+                    {
+                        "token": [
+                            "action_split"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "unknown_func",
+                                "inputs": []
+                            }
+                        ]
                     },
-                    "draggable": false
-                }
-            ]
-        },
-        "draggable": false,
-        "ariaLabel": "traces",
-        "expandParent": true
-    },
-    {
-        "id": "traces-Receiver-receiverNode-otlp",
-        "parentNode": "traces",
-        "extent": "parent",
-        "type": "receiversNode",
-        "position": {
-            "x": 50,
-            "y": 65
-        },
-        "data": {
-            "label": "otlp",
-            "parentNode": "traces",
-            "type": "receivers",
-            "height": 80,
-            "id": "traces-Receiver-receiverNode-otlp",
-            "position": {
-                "x": 50,
-                "y": 65
+                    {
+                        "token": [
+                            "match"
+                        ],
+                        "points_to": [
+                            {
+                                "func_token": "unknown_func",
+                                "inputs": [
+                                    "action_split",
+                                    "re.IGNORECASE"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "token": [
+                            "action_type"
+                        ],
+                        "points_to": []
+                    }
+                ]
+            },
+            {
+                "token": "accumulate_metrics",
+                "parent": [
+                    "file",
+                    "..test.test_example10.functional"
+                ],
+                "process": [
+                    {
+                        "token": [
+                            "total_prompt_tokens"
+                        ],
+                        "points_to": []
+                    },
+                    {
+                        "token": [
+                            "total_completion_tokens"
+                        ],
+                        "points_to": []
+                    },
+                    {
+                        "token": [
+                            "total_tokens"
+                        ],
+                        "points_to": []
+                    },
+                    {
+                        "token": [
+                            "total_prompt_cost"
+                        ],
+                        "points_to": []
+                    },
+                    {
+                        "token": [
+                            "total_completion_cost"
+                        ],
+                        "points_to": []
+                    },
+                    {
+                        "token": [
+                            "total_cost"
+                        ],
+                        "points_to": []
+                    },
+                    {
+                        "token": [
+                            "total_prompt_time"
+                        ],
+                        "points_to": []
+                    }
+                ]
             }
-        },
-        "draggable": false
-    },
-    {
-        "id": "traces-Processor-processorNode-batch",
-        "parentNode": "traces",
-        "extent": "parent",
-        "type": "processorsNode",
-        "position": {
-            "x": 250,
-            "y": 65
-        },
-        "data": {
-            "label": "batch",
-            "parentNode": "traces",
-            "type": "processors",
-            "height": 80,
-            "id": "traces-Processor-processorNode-batch",
-            "position": {
-                "x": 250,
-                "y": 65
-            }
-        },
-        "draggable": false
-    },
-    {
-        "id": "traces-exporter-exporterNode-otlp",
-        "parentNode": "traces",
-        "extent": "parent",
-        "type": "exportersNode",
-        "position": {
-            "x": 460,
-            "y": 65
-        },
-        "data": {
-            "label": "otlp",
-            "parentNode": "traces",
-            "type": "exporters",
-            "height": 80,
-            "id": "traces-exporter-exporterNode-otlp",
-            "position": {
-                "x": 460,
-                "y": 65
-            }
-        },
-        "draggable": false
-    },
-    {
-        "id": "metrics",
-        "type": "parentNodeType",
-        "position": {
-            "x": 0,
-            "y": 0
-        },
-        "data": {
-            "label": "metrics",
-            "parentNode": "metrics",
-            "width": 630,
-            "height": 170,
-            "type": "parentNodeType",
-            "childNodes": [
-                {
-                    "id": "metrics-Receiver-receiverNode-otlp",
-                    "parentNode": "metrics",
-                    "extent": "parent",
-                    "type": "receiversNode",
-                    "position": {
-                        "x": 50,
-                        "y": 65
-                    },
-                    "data": {
-                        "label": "otlp",
-                        "parentNode": "metrics",
-                        "type": "receivers",
-                        "height": 80,
-                        "id": "metrics-Receiver-receiverNode-otlp",
-                        "position": {
-                            "x": 50,
-                            "y": 65
-                        }
-                    },
-                    "draggable": false
-                },
-                {
-                    "id": "metrics-Processor-processorNode-batch",
-                    "parentNode": "metrics",
-                    "extent": "parent",
-                    "type": "processorsNode",
-                    "position": {
-                        "x": 250,
-                        "y": 65
-                    },
-                    "data": {
-                        "label": "batch",
-                        "parentNode": "metrics",
-                        "type": "processors",
-                        "height": 80,
-                        "id": "metrics-Processor-processorNode-batch",
-                        "position": {
-                            "x": 250,
-                            "y": 65
-                        }
-                    },
-                    "draggable": false
-                },
-                {
-                    "id": "metrics-exporter-exporterNode-otlp",
-                    "parentNode": "metrics",
-                    "extent": "parent",
-                    "type": "exportersNode",
-                    "position": {
-                        "x": 460,
-                        "y": 65
-                    },
-                    "data": {
-                        "label": "otlp",
-                        "parentNode": "metrics",
-                        "type": "exporters",
-                        "height": 80,
-                        "id": "metrics-exporter-exporterNode-otlp",
-                        "position": {
-                            "x": 460,
-                            "y": 65
-                        }
-                    },
-                    "draggable": false
-                }
-            ]
-        },
-        "draggable": false,
-        "ariaLabel": "metrics",
-        "expandParent": true
-    },
-    {
-        "id": "metrics-Receiver-receiverNode-otlp",
-        "parentNode": "metrics",
-        "extent": "parent",
-        "type": "receiversNode",
-        "position": {
-            "x": 50,
-            "y": 65
-        },
-        "data": {
-            "label": "otlp",
-            "parentNode": "metrics",
-            "type": "receivers",
-            "height": 80,
-            "id": "metrics-Receiver-receiverNode-otlp",
-            "position": {
-                "x": 50,
-                "y": 65
-            }
-        },
-        "draggable": false
-    },
-    {
-        "id": "metrics-Processor-processorNode-batch",
-        "parentNode": "metrics",
-        "extent": "parent",
-        "type": "processorsNode",
-        "position": {
-            "x": 250,
-            "y": 65
-        },
-        "data": {
-            "label": "batch",
-            "parentNode": "metrics",
-            "type": "processors",
-            "height": 80,
-            "id": "metrics-Processor-processorNode-batch",
-            "position": {
-                "x": 250,
-                "y": 65
-            }
-        },
-        "draggable": false
-    },
-    {
-        "id": "metrics-exporter-exporterNode-otlp",
-        "parentNode": "metrics",
-        "extent": "parent",
-        "type": "exportersNode",
-        "position": {
-            "x": 460,
-            "y": 65
-        },
-        "data": {
-            "label": "otlp",
-            "parentNode": "metrics",
-            "type": "exporters",
-            "height": 80,
-            "id": "metrics-exporter-exporterNode-otlp",
-            "position": {
-                "x": 460,
-                "y": 65
-            }
-        },
-        "draggable": false
-    },
-    {
-        "id": "logs",
-        "type": "parentNodeType",
-        "position": {
-            "x": 0,
-            "y": 0
-        },
-        "data": {
-            "label": "logs",
-            "parentNode": "logs",
-            "width": 630,
-            "height": 170,
-            "type": "parentNodeType",
-            "childNodes": [
-                {
-                    "id": "logs-Receiver-receiverNode-otlp",
-                    "parentNode": "logs",
-                    "extent": "parent",
-                    "type": "receiversNode",
-                    "position": {
-                        "x": 50,
-                        "y": 65
-                    },
-                    "data": {
-                        "label": "otlp",
-                        "parentNode": "logs",
-                        "type": "receivers",
-                        "height": 80,
-                        "id": "logs-Receiver-receiverNode-otlp",
-                        "position": {
-                            "x": 50,
-                            "y": 65
-                        }
-                    },
-                    "draggable": false
-                },
-                {
-                    "id": "logs-Processor-processorNode-batch",
-                    "parentNode": "logs",
-                    "extent": "parent",
-                    "type": "processorsNode",
-                    "position": {
-                        "x": 250,
-                        "y": 65
-                    },
-                    "data": {
-                        "label": "batch",
-                        "parentNode": "logs",
-                        "type": "processors",
-                        "height": 80,
-                        "id": "logs-Processor-processorNode-batch",
-                        "position": {
-                            "x": 250,
-                            "y": 65
-                        }
-                    },
-                    "draggable": false
-                },
-                {
-                    "id": "logs-exporter-exporterNode-otlp",
-                    "parentNode": "logs",
-                    "extent": "parent",
-                    "type": "exportersNode",
-                    "position": {
-                        "x": 460,
-                        "y": 65
-                    },
-                    "data": {
-                        "label": "otlp",
-                        "parentNode": "logs",
-                        "type": "exporters",
-                        "height": 80,
-                        "id": "logs-exporter-exporterNode-otlp",
-                        "position": {
-                            "x": 460,
-                            "y": 65
-                        }
-                    },
-                    "draggable": false
-                }
-            ]
-        },
-        "draggable": false,
-        "ariaLabel": "logs",
-        "expandParent": true
-    },
-    {
-        "id": "logs-Receiver-receiverNode-otlp",
-        "parentNode": "logs",
-        "extent": "parent",
-        "type": "receiversNode",
-        "position": {
-            "x": 50,
-            "y": 65
-        },
-        "data": {
-            "label": "otlp",
-            "parentNode": "logs",
-            "type": "receivers",
-            "height": 80,
-            "id": "logs-Receiver-receiverNode-otlp",
-            "position": {
-                "x": 50,
-                "y": 65
-            }
-        },
-        "draggable": false
-    },
-    {
-        "id": "logs-Processor-processorNode-batch",
-        "parentNode": "logs",
-        "extent": "parent",
-        "type": "processorsNode",
-        "position": {
-            "x": 250,
-            "y": 65
-        },
-        "data": {
-            "label": "batch",
-            "parentNode": "logs",
-            "type": "processors",
-            "height": 80,
-            "id": "logs-Processor-processorNode-batch",
-            "position": {
-                "x": 250,
-                "y": 65
-            }
-        },
-        "draggable": false
-    },
-    {
-        "id": "logs-exporter-exporterNode-otlp",
-        "parentNode": "logs",
-        "extent": "parent",
-        "type": "exportersNode",
-        "position": {
-            "x": 460,
-            "y": 65
-        },
-        "data": {
-            "label": "otlp",
-            "parentNode": "logs",
-            "type": "exporters",
-            "height": 80,
-            "id": "logs-exporter-exporterNode-otlp",
-            "position": {
-                "x": 460,
-                "y": 65
-            }
-        },
-        "draggable": false
+        ],
+        "class_list": []
     }
-]
+}

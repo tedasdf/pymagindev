@@ -50,6 +50,7 @@ export default function FileHierarchy() {
 
       if (node && isFile(node)) {
         console.log("Opening file:", node.data.name);
+        
       }
     }
   });
@@ -125,7 +126,7 @@ export default function FileHierarchy() {
   const plugins = [traits, rovingFocus, selections, dnd];
 
   return (
-    <main className={styles.theme("dark")}>
+    <main className={styles.theme("light")}>
       <div ref={windowRef} className={explorerStyles()}>
         <div {...virtualize.props}>
           {virtualize.map((props) => {
@@ -157,7 +158,7 @@ const styles = createStyles({
       colors: {
         ...colors,
         textColor: colors.slate.slate12,
-        bgColor: colors.blue.blue1,
+        bgColor: 'transparent',
 
         selected: {
           textColor: colors.blue.blue11
@@ -199,7 +200,6 @@ const styles = createStyles({
 const explorerStyles = styles.one((t) => ({
   background: t.colors.bgColor,
   color: t.colors.textColor,
-  height: "100vh",
   width: "100%",
   overflow: "auto",
 
@@ -237,14 +237,8 @@ const explorerStyles = styles.one((t) => ({
   },
 
   ".focused": {
-    borderColor: t.colors.focused.borderColor,
-    backgroundColor: t.colors.focused.bgColor,
     outline: "none"
   },
-
-  ".drop-target": {
-    backgroundColor: t.colors.dropTarget.bgColor
-  }
 }));
 
 styles.insertGlobal(reset);

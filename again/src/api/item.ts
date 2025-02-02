@@ -2,9 +2,10 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:8000";
 
-
-
-
+export interface FileHierarchyItem{
+    name: string,
+    type: "file" | "dir" 
+}
 
 export interface Call{
   func_token: string;

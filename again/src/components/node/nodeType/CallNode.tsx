@@ -1,14 +1,19 @@
 import { memo } from "react";
-import { Call } from "../dataType";
 import { NodeTag } from "./NodeTag";
 import { Handle, Position } from "@xyflow/react";
 import { getHandleStyle } from "../utils";
+
+interface CallNode {
+    functionName: string;
+    args?: any[]; // arguments for the function call
+    outputs?: string[];
+}
 
 
 const CallNode = ({
     data
 }: {
-    data: Call;
+    data: CallNode;
 }) => {
 
     const functionName = data.functionName;

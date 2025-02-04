@@ -50,7 +50,7 @@ export default function App() {
     style={{zIndex:'0'}}
   >    
   <div className="update-node__controls" style={{ width:'15%'}}>
-    <FileHierarchy setNode={setNode} />
+    <FileHierarchy setNodes={setNodes} />
   </div>  
   <div className="update-node__controls" style={{  right: '10px' , top: '10px'}}>
   <div className="update-node__checkbox-wrapper">

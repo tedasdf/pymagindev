@@ -9,21 +9,21 @@ import VariableNode from '../components/node/nodeType/VariableNode';
 import ProcessFunctionNode from '../components/node/nodeType/ProcessFunctionNode';
 
 export const initialNodes = [
-  {
-    id: 'clin/agent.py',
-    type: 'fileNode',
-    position: {x: 0 , y: 0},
-    draggable: false,
-    data: { 
-      token: 'clin/agent.py',
-      width: 250,
-      height: 250,
-    },
-    style: {
-      width: 250,
-      height: 250
-    }
-  },
+  // {
+  //   id: 'clin/agent.py',
+  //   type: 'fileNode',
+  //   position: {x: 0 , y: 0},
+  //   draggable: false,
+  //   data: { 
+  //     token: 'clin/agent.py',
+  //     width: 250,
+  //     height: 250,
+  //   },
+  //   style: {
+  //     width: 250,
+  //     height: 250
+  //   }
+  // },
   // {
   //   id:'variable',
   //   type:'variableNode',

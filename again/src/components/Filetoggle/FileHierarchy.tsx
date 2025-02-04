@@ -17,6 +17,8 @@ import { VscFolder, VscFolderOpened, VscFile } from "react-icons/vsc";
 import * as colors from "@radix-ui/colors";
 import React from "react";
 import { mockFs } from "./mock-fs";
+import { fetchAllFileItems } from "../../api/item";
+import fetchAndCreateNodes from "../../utils/helper";
 
 const tree = createFileTree((parent, { createFile, createDir }) =>
   Promise.resolve(
@@ -31,8 +33,8 @@ const tree = createFileTree((parent, { createFile, createDir }) =>
     )
   )
 );
-  
-export default function FileHierarchy() {
+
+export default function FileHierarchy({ nodes, setNode }) {
   const windowRef = React.useRef<HTMLDivElement | null>(null);
   const rovingFocus = useRovingFocus(tree);
   const selections = useSelections(tree);
@@ -50,7 +52,21 @@ export default function FileHierarchy() {
 
       if (node && isFile(node)) {
         console.log("Opening file:", node.data.name);
-        
+        const fetchFileContent = async () => {
+          try {
+            const newNode = await fetchAndCreateNodes();
+
+            if (newNode) {
+              setNode(prevNodes => [...prevNodes, newNode]);
+            }
+
+          } catch (error) {
+            console.error("Failed to fetch file content:", error);
+          }
+        };
+  
+        // Call the async function
+        fetchFileContent();
       }
     }
   });
@@ -126,7 +142,7 @@ export default function FileHierarchy() {
   const plugins = [traits, rovingFocus, selections, dnd];
 
   return (
-    <main className={styles.theme("light")}>
+    <main className={styles.theme("dark")}>
       <div ref={windowRef} className={explorerStyles()}>
         <div {...virtualize.props}>
           {virtualize.map((props) => {
@@ -158,7 +174,7 @@ const styles = createStyles({
       colors: {
         ...colors,
         textColor: colors.slate.slate12,
-        bgColor: 'transparent',
+        bgColor: colors.blue.blue1,
 
         selected: {
           textColor: colors.blue.blue11
@@ -200,6 +216,7 @@ const styles = createStyles({
 const explorerStyles = styles.one((t) => ({
   background: t.colors.bgColor,
   color: t.colors.textColor,
+  height: "100vh",
   width: "100%",
   overflow: "auto",
 
@@ -237,8 +254,14 @@ const explorerStyles = styles.one((t) => ({
   },
 
   ".focused": {
+    borderColor: t.colors.focused.borderColor,
+    backgroundColor: t.colors.focused.bgColor,
     outline: "none"
   },
+
+  ".drop-target": {
+    backgroundColor: t.colors.dropTarget.bgColor
+  }
 }));
 
 styles.insertGlobal(reset);

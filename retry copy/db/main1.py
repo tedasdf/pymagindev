@@ -27,6 +27,7 @@ class FunctionModel(BaseModel):
     token: str  # Name of the function
     parent: Tuple[str ,str]  # A tuple with (parent type, token)
     process: List[Union[CallModel, VariableModel, str]]  # A list of Call, Variable, or string
+    inputs: List[str]
 
 class ClassModel(BaseModel):
     token: str

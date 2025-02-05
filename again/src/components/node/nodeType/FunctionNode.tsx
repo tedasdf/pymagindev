@@ -1,11 +1,16 @@
 import { memo } from "react";
 import { IFunction } from "../dataType";
 import { NodeTag } from "./NodeTag";
-import { Handle, Position } from '@xyflow/react';
-import { getHandleStyle } from "../utils";
+// import { Handle, Position } from '@xyflow/react';
+// import { getHandleStyle } from "../utils";
+import { fetchAndCreateProcess } from "../../../utils/helper";
+
+
+
 
 const FunctionNode = ({
-    data, isConnectable ,
+    data, 
+    isConnectable
 }:{
     data: IFunction,
     isConnectable: boolean
@@ -15,10 +20,20 @@ const FunctionNode = ({
     // const input_length = data.input?.length ?? 0;
     // const output_length = data.output?.length ?? 0;
 
-    const handleClick = () => {
+    const handleClick = async () => {
         console.log('Function clicked:', token_name);
-        // Add your click handling logic here
-        
+        try {
+            // Add your click handling logic here
+            const [newNode ,newEdge] = await fetchAndCreateProcess('..test.test_example10.functional', token_name);
+            console.log(newNode); // Changed from response to newNode
+            console.log(newEdge);
+            // Since newNode is a single node, not an array, remove the spread operator
+            data.setNodes((currentNodes) => [...currentNodes, ...newNode]);
+            data.setEdges((currentEdges) => [...currentEdges, ...newEdge]);
+        } catch (error) {
+            console.error('Error creating node:', error);
+        }
+
     };
 
     return (

@@ -21,6 +21,7 @@ export interface IFunction {
     process?: (Variable | Call | LogicStatement)[];
     input?: string[];
     output?: string[];
+    setNodes?: (nodes: Node[]) => void;
 }
   
 

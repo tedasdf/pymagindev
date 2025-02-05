@@ -49,7 +49,7 @@ export default function App() {
     style={{zIndex:'0'}}
   >    
   <div className="update-node__controls" style={{ width:'15%'}}>
-    <FileHierarchy nodes={nodes} setNodes={setNodes} />
+    <FileHierarchy nodes={nodes} setNodes={setNodes} setEdges={setEdges} />
   </div>  
     <Background />
     <MiniMap />

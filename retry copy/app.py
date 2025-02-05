@@ -35,8 +35,8 @@ app.add_middleware(
 )
 
 
-@app.post('/file/{file_token}/{function_name}')
-async def upload_file_path(file_token, function_name):
+@app.get('/file/{file_token}/{function_name}')
+async def get_function(file_token, function_name):
     files = files_group[file_token]
     function_inst = None
     for i in files.function_list:

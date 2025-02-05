@@ -335,7 +335,9 @@ def pymag(sources):
                 FunctionModel(
                     token=func_inst.token,
                     parent=('file',file_inst.token),
-                    process=process_db_list
+                    process=process_db_list,
+                    inputs=func_inst.input_list
+
                 )
             )
         file_db_inst = FileModel(

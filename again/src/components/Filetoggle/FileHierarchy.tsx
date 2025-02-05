@@ -39,7 +39,7 @@ const tree = createFileTree((parent, { createFile, createDir }) =>
   )
 );
 
-export default function FileHierarchy({ nodes, setNodes }: FileHierarchyProps) {
+export default function FileHierarchy({ nodes, setNodes , setEdges}: FileHierarchyProps) {
   const windowRef = React.useRef<HTMLDivElement | null>(null);
   const rovingFocus = useRovingFocus(tree);
   const selections = useSelections(tree);
@@ -59,7 +59,7 @@ export default function FileHierarchy({ nodes, setNodes }: FileHierarchyProps) {
         console.log("Opening file:", node.data.name);
         const fetchFileContent = async () => {
           try {
-            const newNode = await fetchAndCreateNodes();
+            const newNode = await fetchAndCreateNodes(setNodes, setEdges);
 
             setNodes((currentNodes) => [...currentNodes, ...newNode]); // Use functional update pattern
           } catch (error) {

@@ -1,209 +1,16 @@
 'server'
-import { useMemo } from 'react';
-import { fetchAllFileItems, fetchFunctionDetails, FileHierarchyItem, FileItem } from '../api/item';
-import { initialNodes } from '../nodes';
-
-
-
-
-// const createNode = (fileNode: FileItem, height: number, connectors?: object) => {
-// 	const nodesToAdd: Node[] = [];
-// 	const keyTraces = Object.keys(parentNode);
-
-// 	const calcYPosition = (index: number, parentHeight: number, nodes: string[]): number | undefined => {
-// 		const childNodePositions = [];
-// 		const spaceBetweenNodes = (parentHeight - nodes.length * childNodesHeight) / (nodes.length + 1);
-
-// 		for (let i = 0; i < nodes.length; i++) {
-// 			const yPosition = spaceBetweenNodes + i * (childNodesHeight + spaceBetweenNodes);
-
-// 			childNodePositions.push(yPosition);
-// 		}
-// 		switch (nodes.length) {
-// 			case 0:
-// 				return;
-// 			case 1:
-// 				return (parentHeight - 40) / 2 - 20;
-// 			default:
-// 				return childNodePositions[index];
-// 		}
-// 	};
-
-// 	const processorPosition = (index: number, parentHeight: number, receivers: string[]): XYPosition => {
-// 		const receiverLength = receivers.length ? 250 : 0;
-// 		return { x: receiverLength + index * 200, y: (parentHeight - 40) / 2 - 20 };
-// 	};
-
-// 	const receiverPosition = (index: number, parentHeight: number, receivers: string[]): XYPosition => {
-// 		const positionY = calcYPosition(index, parentHeight, receivers);
-// 		return { x: 50, y: positionY ?? parentHeight / 2 };
-// 	};
-
-// 	const exporterPosition = (
-// 		index: number,
-// 		parentHeight: number,
-// 		exporters: string[],
-// 		processors: string[]
-// 	): XYPosition => {
-// 		const positionY = calcYPosition(index, parentHeight, exporters);
-// 		const processorLength = (processors?.length ?? 0) * 200 + 260;
-// 		return { x: processorLength, y: positionY ?? parentHeight / 2 };
-// 	};
-// 	const processors = parentNode.processors;
-// 	const receivers = parentNode.receivers;
-// 	const exporters = parentNode.exporters;
-// 	keyTraces.forEach((traceItem) => {
-// 		switch (traceItem) {
-// 			case "processors":
-// 				processors?.map((processor, index) => {
-// 					const id = `${pipelineName}-Processor-processorNode-${processor}`;
-
-// 					nodesToAdd.push({
-// 						id: id,
-// 						parentNode: pipelineName,
-// 						extent: "parent",
-// 						type: "processorsNode",
-// 						position: processorPosition(index, height, processors),
-// 						data: {
-// 							label: processor,
-// 							parentNode: pipelineName,
-// 							type: "processors",
-// 							height: childNodesHeight,
-// 							id: id,
-// 							position: processorPosition(index, height, processors),
-// 						},
-// 						draggable: false,
-// 					});
-// 				});
-// 				break;
-// 			case "receivers":
-// 				receivers?.map((receiver, index) => {
-// 					const isConnector = connectors?.hasOwnProperty(receiver) ? "connectors/receivers" : "receivers";
-// 					const id = `${pipelineName}-Receiver-receiverNode-${receiver}`;
-
-// 					nodesToAdd.push({
-// 						id: id,
-// 						parentNode: pipelineName,
-// 						extent: "parent",
-// 						type: "receiversNode",
-// 						position: receiverPosition(index, height, receivers),
-// 						data: {
-// 							label: receiver,
-// 							parentNode: pipelineName,
-// 							type: isConnector,
-// 							height: childNodesHeight,
-// 							id: id,
-// 							position: receiverPosition(index, height, receivers),
-// 						},
-// 						draggable: false,
-// 					});
-// 				});
-// 				break;
-// 			case "exporters":
-// 				exporters?.map((exporter, index) => {
-// 					const isConnector = connectors?.hasOwnProperty(exporter) ? "connectors/exporters" : "exporters";
-// 					const id = `${pipelineName}-exporter-exporterNode-${exporter}`;
-// 					nodesToAdd.push({
-// 						id: id,
-// 						parentNode: pipelineName,
-// 						extent: "parent",
-// 						type: "exportersNode",
-// 						position: exporterPosition(index, height, exporters, processors ?? []),
-// 						data: {
-// 							label: exporter,
-// 							parentNode: pipelineName,
-// 							type: isConnector,
-// 							height: childNodesHeight,
-// 							id: id,
-// 							position: exporterPosition(index, height, exporters, processors ?? []),
-// 						},
-// 						draggable: false,
-// 					});
-// 				});
-// 				break;
-// 		}
-// 	});
-// 	return nodesToAdd;
-// };
-
-
-// export const useClientNodes = (value) => {
-// 	return useMemo(() => calcNodes(value), [value]);
-// };
-
-// const childNodesHeight = 80;
-
-// export const calcNodes = (value) => {
-
-//     let newNode:any = [];
-//     for (const [fileName, fileItem] of Object.entries(value)){
-//         const num_function = fileItem.function_list?.length ?? 0;
-//         const spaceBetweenParents = 40;
-// 		const spaceBetweenNodes = 90;
-//         const totalSpacing = num_function * spaceBetweenNodes;
-// 		const parentHeight = totalSpacing + num_function * childNodesHeight;
-
-
-//         newNode.push({
-// 			id: fileName,
-// 			type: "fileNode",
-// 			position: { x: 0, y: 0 },
-// 			data: {
-// 				token: pipelineName,
-// 				parentNode: pipelineName,
-// 				width: 430 + 200 * (pipeline.processors?.length ?? 0),
-// 				height: maxNodes === 1 ? parentHeight : parentHeight + spaceBetweenParents,
-// 				type: "parentNodeType",
-// 				childNodes: createNode(pipelineName, pipeline, parentHeight + spaceBetweenParents, connectors),
-// 			},
-// 			draggable: false,
-// 			ariaLabel: pipelineName,
-// 			expandParent: true,
-// 		});
-//     }
-
-
-
-// 	for (const [pipelineName, pipeline] of Object.entries(pipelines)) {
-// 		const receivers = pipeline.receivers?.length ?? 0;
-// 		const exporters = pipeline.exporters?.length ?? 0;
-// 		const maxNodes = Math.max(receivers, exporters) ?? 1;
-// 		const spaceBetweenParents = 40;
-// 		const spaceBetweenNodes = 90;
-// 		const totalSpacing = maxNodes * spaceBetweenNodes;
-// 		const parentHeight = totalSpacing + maxNodes * childNodesHeight;
-
-// 		nodesToAdd.push({
-// 			id: pipelineName,
-// 			type: "parentNodeType",
-// 			position: { x: 0, y: 0 },
-// 			data: {
-// 				label: pipelineName,
-// 				parentNode: pipelineName,
-// 				width: 430 + 200 * (pipeline.processors?.length ?? 0),
-// 				height: maxNodes === 1 ? parentHeight : parentHeight + spaceBetweenParents,
-// 				type: "parentNodeType",
-// 				childNodes: createNode(pipelineName, pipeline, parentHeight + spaceBetweenParents, connectors),
-// 			},
-// 			draggable: false,
-// 			ariaLabel: pipelineName,
-// 			expandParent: true,
-// 		});
-// 		const childNodes = createNode(pipelineName, pipeline, parentHeight + spaceBetweenParents, connectors);
-// 		nodesToAdd.push(...childNodes);
-// 	}
-// 	return nodesToAdd;
-// };
-
+import { fetchAllFileItems, fetchFunctionDetails, FileItem } from '../api/item';
+import { Edge, Node } from '@xyflow/react';
 
 // Main function to fetch and create nodes
-export default async function fetchAndCreateNodes(): Promise<FlowNode> {
+export default async function fetchAndCreateNodes(setNodes , setEdges): Promise<Node[]> {
     try {
         const result: Record<string, FileItem> = await fetchAllFileItems('..test.test_example10.functional');
         const ChangedResult = result['file'];
+
         console.log("THIS IS THE FILE ITEM");
 		console.log(ChangedResult);
-        let newNode: Node[] = makeNode(ChangedResult);
+        let newNode: Node[] = makeNode(ChangedResult, setNodes, setEdges);
         return newNode;
     } catch (error) {
         console.error("Error in fetchAndCreateNodes:", error);
@@ -211,7 +18,7 @@ export default async function fetchAndCreateNodes(): Promise<FlowNode> {
 }
 
 // Function to create nodes from a FileItem
-export function makeNode(file: FileItem): Node[] {
+export function makeNode(file: FileItem, setNodes , setEdges): Node[] {
     const newNode: Node[] = [];
     
     const nodeGap = 250 ;
@@ -254,9 +61,12 @@ export function makeNode(file: FileItem): Node[] {
                 name: func.token,
                 input: ['input1', 'INPUT2'],
                 output: ['x', 'y', 'z'],
+                setNodes: setNodes,
+                setEdges: setEdges,
             },
         });
     }
+
 
     return newNode; // Return the array of created nodes
 }
@@ -267,17 +77,71 @@ export const fetchAndCreateProcess = async (fileToken: string, functionName: str
         const processNode = await fetchFunctionDetails(fileToken, functionName);
         // Create and return the process node
         let newNode: Node[] = [];
-        for (const process of processNode.process){
-           if (process.type === 'Call'){
+        let newEdge: Edge[] = [];
 
-           }elseif (process.type === 'Variable'){
-           
-            }else{
-                
-            }
+
+        const nodeGap = 25 ;
+        const nodeStart = 550;
+        let i = 0;
+        const nodeStartY = 0;
+        for (const input_inst of processNode.inputs){
             
+            newNode.push({
+                id: `variable-${input_inst}`,
+                type: 'variableNode',
+                position: { x: nodeStart + i * nodeGap, y: nodeStartY + i *nodeGap },
+                data: {
+                    name: input_inst,
+                },
+                
+            })
+            i += 1;
         }
-        return newNode;
+
+        for (const input_inst of processNode.inputs){
+            
+            newNode.push({
+                id: `variable-${input_inst}`,
+                type: 'variableNode',
+                position: { x: nodeStart + i * nodeGap, y: nodeStartY + i *nodeGap },
+                data: {
+                    name: input_inst,
+                },
+                draggable:true,
+            })
+            i += 1;
+        }
+        let j = i;
+
+        for (const process_inst of processNode.process){
+            j += 1;
+           if (process_inst.points_to){
+                newNode.push({
+                    id: `variable-${process_inst.token}`,
+                    type: 'variableNode',
+                    position: { x: nodeStart + i * nodeGap, y: nodeStartY + j *nodeGap },
+                    data: {
+                        name: process_inst.token,
+                    },
+                    draggable:true,
+                })
+                for (const point_to of process_inst.points_to){
+                    if (point_to.func_token != 'unknown_func'){
+                        console.log(point_to);
+                    }else{
+                        point_to.inputs.forEach((input: string) => {
+                            newEdge.push({
+                                id: `${process_inst.token}-${input}`,
+                                source: `variable-${input}`,
+                                target: `variable-${process_inst.token}`,
+                            })
+                        })
+                    }
+                }
+            }
+        }
+
+        return [newNode, newEdge];
 
     } catch (error) {
         console.error("Error creating process node:", error);

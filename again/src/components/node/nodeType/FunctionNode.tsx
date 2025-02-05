@@ -12,8 +12,14 @@ const FunctionNode = ({
 }) => {
     const token_name = data.name;
     
-    const input_length = data.input?.length ?? 0;
-    const output_length = data.output?.length ?? 0;
+    // const input_length = data.input?.length ?? 0;
+    // const output_length = data.output?.length ?? 0;
+
+    const handleClick = () => {
+        console.log('Function clicked:', token_name);
+        // Add your click handling logic here
+        
+    };
 
     return (
         <div
@@ -23,13 +29,14 @@ const FunctionNode = ({
                 border: "1px dashed black",
                 borderRadius: "4px"
             }}
+            onClick={handleClick}
             className={`flex`}>
             <NodeTag type="function" />
             <div className="flex items-center px-3 text-xs font-medium overflow-hidden whitespace-nowrap overflow-ellipsis w-full">
                 {token_name}
             </div>
 
-            {/* Dynamically create handles based on input */}
+            {/* Dynamically create handles based on input
             {data.input && input_length > 0 && (
             <>
             {data.input.map((_, index) => (
@@ -57,7 +64,7 @@ const FunctionNode = ({
                 />
             ))}
             </>
-            )}
+            )} */}
         </div>
     )
 }

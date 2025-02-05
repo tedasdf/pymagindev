@@ -54,3 +54,13 @@ export const fetchAllFileItems = async (token_name: string): Promise<Record<stri
     throw new Error("Failed to fetch file items. Please try again later.");
   }
 };
+
+export const fetchFunctionDetails = async (fileToken: string, functionName: string): Promise<Func> => {
+  try {
+    const response = await apiClient.post<Func>(`/file/${fileToken}/${functionName}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching function details:", error.message || error);
+    throw new Error("Failed to fetch function details. Please try again later.");
+  }
+};

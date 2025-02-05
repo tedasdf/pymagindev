@@ -1,6 +1,6 @@
 'server'
 import { useMemo } from 'react';
-import { fetchAllFileItems, FileHierarchyItem, FileItem } from '../api/item';
+import { fetchAllFileItems, fetchFunctionDetails, FileHierarchyItem, FileItem } from '../api/item';
 import { initialNodes } from '../nodes';
 
 
@@ -197,16 +197,13 @@ import { initialNodes } from '../nodes';
 
 
 // Main function to fetch and create nodes
-export default async function fetchAndCreateNodes(): Promise<Node[] | void> {
+export default async function fetchAndCreateNodes(): Promise<FlowNode> {
     try {
         const result: Record<string, FileItem> = await fetchAllFileItems('..test.test_example10.functional');
         const ChangedResult = result['file'];
-        let newNode: Node[] = [];
+        console.log("THIS IS THE FILE ITEM");
 		console.log(ChangedResult);
-        if (ChangedResult) {
-            newNode = makeNode(ChangedResult);
-        }
-		console.log(newNodes);
+        let newNode: Node[] = makeNode(ChangedResult);
         return newNode;
     } catch (error) {
         console.error("Error in fetchAndCreateNodes:", error);
@@ -216,32 +213,43 @@ export default async function fetchAndCreateNodes(): Promise<Node[] | void> {
 // Function to create nodes from a FileItem
 export function makeNode(file: FileItem): Node[] {
     const newNode: Node[] = [];
-
+    
+    const nodeGap = 250 ;
+    const nodeGapy = 50;
+    const filex = 0;
+    const filey = 0;
     // Create the file node
     const fileNodeId = `file-${file.token}`;
     newNode.push({
         id: fileNodeId,
         type: 'fileNode',
-        position: { x: 0, y: 0 },
+        position: { x: filex, y: filey },
         draggable: false,
         data: {
             token: file.token,
-            width: 250,
+            width: 500,
             height: 250,
         },
         style: {
-            width: 250,
+            width: 500,
             height: 250,
         },
     });
 
+    let i = 0;
+    let j = 0;
     // Create nodes for each function in the function_list
     for (const func of file.function_list) {
+        j += 1;
+        if ((filey + j * nodeGapy) > 200){
+            j = 1;
+            i += 1;
+        }
         const funcNodeId = `func-${func.token}`;
         newNode.push({
             id: funcNodeId,
             type: 'functionNode',
-            position: { x: 0, y: 10 }, // Adjust position as needed
+            position: { x: filex + i * nodeGap, y: filey + j * nodeGapy  }, // Adjust position as needed
             data: {
                 name: func.token,
                 input: ['input1', 'INPUT2'],
@@ -252,3 +260,28 @@ export function makeNode(file: FileItem): Node[] {
 
     return newNode; // Return the array of created nodes
 }
+
+
+export const fetchAndCreateProcess = async (fileToken: string, functionName: string) => {
+    try {
+        const processNode = await fetchFunctionDetails(fileToken, functionName);
+        // Create and return the process node
+        let newNode: Node[] = [];
+        for (const process of processNode.process){
+           if (process.type === 'Call'){
+
+           }elseif (process.type === 'Variable'){
+           
+            }else{
+                
+            }
+            
+        }
+        return newNode;
+
+    } catch (error) {
+        console.error("Error creating process node:", error);
+        throw error;
+    }
+
+};

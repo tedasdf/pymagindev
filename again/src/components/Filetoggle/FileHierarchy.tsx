@@ -17,8 +17,13 @@ import { VscFolder, VscFolderOpened, VscFile } from "react-icons/vsc";
 import * as colors from "@radix-ui/colors";
 import React from "react";
 import { mockFs } from "./mock-fs";
-import { fetchAllFileItems } from "../../api/item";
 import fetchAndCreateNodes from "../../utils/helper";
+import { Node as FlowNode } from '@xyflow/react';
+
+interface FileHierarchyProps {
+  nodes: FlowNode[];  // Changed from prevNodes to nodes to match App.tsx
+  setNodes: React.Dispatch<React.SetStateAction<FlowNode[]>>;
+}
 
 const tree = createFileTree((parent, { createFile, createDir }) =>
   Promise.resolve(
@@ -34,7 +39,7 @@ const tree = createFileTree((parent, { createFile, createDir }) =>
   )
 );
 
-export default function FileHierarchy({ setNodes }  ) {
+export default function FileHierarchy({ nodes, setNodes }: FileHierarchyProps) {
   const windowRef = React.useRef<HTMLDivElement | null>(null);
   const rovingFocus = useRovingFocus(tree);
   const selections = useSelections(tree);
@@ -54,13 +59,9 @@ export default function FileHierarchy({ setNodes }  ) {
         console.log("Opening file:", node.data.name);
         const fetchFileContent = async () => {
           try {
-            const node = await fetchAndCreateNodes();
+            const newNode = await fetchAndCreateNodes();
 
-            console.log(node);
-
-            setNodes(prevNodes => [...prevNodes, node])
-
-
+            setNodes((currentNodes) => [...currentNodes, ...newNode]); // Use functional update pattern
           } catch (error) {
             console.error("Failed to fetch file content:", error);
           }

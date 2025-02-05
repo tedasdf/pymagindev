@@ -35,6 +35,16 @@ app.add_middleware(
 )
 
 
+@app.post('/file/{file_token}/{function_name}')
+async def upload_file_path(file_token, function_name):
+    files = files_group[file_token]
+    function_inst = None
+    for i in files.function_list:
+        if function_name == i.token:
+            function_inst = i
+
+    return function_inst
+
 @app.post('/file/{file_path}')
 async def upload_file_path(file_path):
     files = pymag(file_path)

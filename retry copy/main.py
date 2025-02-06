@@ -89,9 +89,8 @@ def make_file_group(tree, file_path, raw_source_paths):
     )
 
     file_inst = File(token, file_path)
-    print("=================================================================================================")
-    print("FILE_TOKEN:")
-    print(file_inst.token)
+    
+
     [raw_source_path] = raw_source_paths
     file_inst.imported_list = language.make_import(import_trees, file_inst.file_path, raw_source_path)
 
@@ -106,8 +105,6 @@ def make_file_group(tree, file_path, raw_source_paths):
     for subgroup_tree in subgroup_trees:
         file_inst.add_classes_list(language.make_class(subgroup_tree, parent=file_inst))
 
-    print(file_inst.classes_list)
-    print("=================================================================================================")
     return file_inst
 
 
@@ -262,8 +259,7 @@ def check_process(processes, file_symbol_dict):
     for pro in processes:
     
         if isinstance(pro, Call):
-            print("CALL:")
-            print(pro)
+            continue
     
         elif isinstance(pro, Variable):
             call_db_list = sort_call_in_var(pro.points_to,file_symbol_dict)
@@ -281,7 +277,7 @@ def check_process(processes, file_symbol_dict):
             # check_process(pro.process)
             # if pro.else_branch != None:
                 # check_process(pro.else_branch)
-    print(process_db_list)
+
     return process_db_list
 
 
@@ -319,7 +315,6 @@ def pymag(sources):
         file_symbol_dict = file_inst.symbols_dict()
         for import_inst in file_inst.imported_list:
             if type(import_inst) == dict:
-                # print(import_inst)
                 [key] = import_inst.keys()
                 file_import = file_group[key]
                 file_import_symbol_dict = file_import.symbols_dict(import_inst[key])
@@ -336,7 +331,8 @@ def pymag(sources):
                     token=func_inst.token,
                     parent=('file',file_inst.token),
                     process=process_db_list,
-                    inputs=func_inst.input_list
+                    inputs=func_inst.input_list,
+                    output=func_inst.output_list
 
                 )
             )
@@ -348,12 +344,6 @@ def pymag(sources):
     
         file_db[file_key] = file_db_inst
 
-
-
-
-
-
-
             # classes_instes = file_inst.classes_list
             # # in file symbol 
 
@@ -362,9 +352,12 @@ def pymag(sources):
             #     class_symbol = class_inst.all_symbols_dict()
             #     for func in class_inst.functions:
             #         check_process(func.process)
-    print("GELLO")
     return file_db_inst
 
 
 if __name__ == "__main__":
-    pymag('.\\test\\test_example10\\functional.py')
+    parser = argparse.ArgumentParser(description='Process Python source files.')
+    parser.add_argument('sources', nargs='+', help='Source files or directories to analyze')
+    args = parser.parse_args()
+    
+    pymag(args.sources)

@@ -21,6 +21,7 @@ const ProcessFunctionNode = ({
         <div
             key={token_name}
             style={{
+                position: 'absolute',
                 border: "1px dashed black",
                 borderRadius: "4px",
             }}

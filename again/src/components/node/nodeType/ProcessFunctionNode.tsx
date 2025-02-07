@@ -24,14 +24,18 @@ const ProcessFunctionNode = ({
                 position: 'absolute',
                 border: "1px dashed black",
                 borderRadius: "4px",
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
             }}
             className={`flex w-full`}>
-            <NodeTag type="function" />
-            <div className="flex items-center px-3 text-xs font-medium overflow-hidden whitespace-nowrap overflow-ellipsis w-full">
+
+
+            <div className="flex justify-end items-start px-3 text-xs font-medium overflow-hidden whitespace-nowrap overflow-ellipsis w-full">
                 {token_name}
             </div>
 
-            {/* Dynamically create handles based on input */}
+            {/* Dynamically create handles based on input
             {data.input && input_length > 0 && (
             <>
             {data.input.map((_, index) => (
@@ -57,9 +61,9 @@ const ProcessFunctionNode = ({
                 isConnectable={isConnectable}
                 style={getHandleStyle(index, output_length)}
                 />
-            ))}
-            </>
-            )}
+            ))} 
+            </> 
+            )}*/}
         </div>
     )
 }

@@ -42,7 +42,8 @@ const FunctionNode = ({
             style={{
                 backgroundColor: "rgba(145, 29, 201, 0.05)" ,
                 border: "1px dashed black",
-                borderRadius: "4px"
+                borderRadius: "4px",
+                position: 'relative'
             }}
             onClick={handleClick}
             className={`flex`}>
@@ -51,7 +52,7 @@ const FunctionNode = ({
                 {token_name}
             </div>
 
-            {/* Dynamically create handles based on input
+            {/* Dynamically create handles based on input/*
             {data.input && input_length > 0 && (
             <>
             {data.input.map((_, index) => (

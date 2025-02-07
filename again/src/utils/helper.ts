@@ -55,15 +55,17 @@ export function makeNode(file: FileItem, setNodes , setEdges): Node[] {
         const funcNodeId = `func-${func.token}`;
         newNode.push({
             id: funcNodeId,
-            type: 'functionNode',
+            type: 'symbolNode',
             position: { x: filex + i * nodeGap, y: filey + j * nodeGapy  }, // Adjust position as needed
             data: {
-                name: func.token,
-                input: ['input1', 'INPUT2'],
-                output: ['x', 'y', 'z'],
+                SymbolName: func.token,
+                type: 'function',
+                parent: file.token,
                 setNodes: setNodes,
                 setEdges: setEdges,
             },
+            extent: 'parent',
+            parentId: fileNodeId,
         });
     }
 
@@ -81,68 +83,84 @@ export const fetchAndCreateProcess = async (fileToken: string, functionName: str
 
 
         const nodeStart = 550;
+        const nodeGap = 20;
+        
+        const processLength = processNode.process?.length?? 0;
+        
+        // size is determined by the nubmer of processs
+        //and also the max number of varaibles in a single process
 
         newNode.push({
-            id: `function_process_${processNode.token}`,
-            type: 'functionProcessNode',
+            id: `function_${processNode.token}`,
+            type: 'processFunctionNode',
             position: { x: nodeStart, y: 0 },
+            style: {
+                width: 500,
+                height: 250,
+            },
             data: {
                 name: processNode.token,
             },
         })
+        
+        let x_pos = 0;
+
         for (const input_inst of processNode.inputs){
             
             newNode.push({
-                id: `variable-${input_inst}`,
+                id: `function_${processNode.token}_variable_${input_inst}`,
                 type: 'variableNode',
-                position: { x: 0, y: 0 },
+                position: { x: x_pos, y: 0 },
                 data: {
                     name: input_inst,
                 },
                 extent: 'parent',
-                parentId: `function_process_${processNode.token}`,
+                parentId: `function_${processNode.token}`,
             })
+            x_pos += nodeGap;
         }
 
-        // for (const input_inst of processNode.inputs){
-            
-        //     newNode.push({
-        //         id: `variable-${input_inst}`,
-        //         type: 'variableNode',
-        //         position: { x: 0 , y: 0 },
-        //         data: {
-        //             name: input_inst,
-        //         },
-        //         draggable:true,
-        //     })
-        // }
+        let  y_position = 0;
 
-        // for (const process_inst of processNode.process){
-        //    if (process_inst.points_to){
-        //         newNode.push({
-        //             id: `variable-${process_inst.token}`,
-        //             type: 'variableNode',
-        //             position: { x: 0, y: 0 },
-        //             data: {
-        //                 name: process_inst.token,
-        //             },
-        //             draggable:true,
-        //         })
-        //         for (const point_to of process_inst.points_to){
-        //             if (point_to.func_token != 'unknown_func'){
-        //                 console.log(point_to);
-        //             }else{
-        //                 point_to.inputs.forEach((input: string) => {
-        //                     newEdge.push({
-        //                         id: `${process_inst.token}-${input}`,
-        //                         source: `variable-${input}`,
-        //                         target: `variable-${process_inst.token}`,
-        //                     })
-        //                 })
-        //             }
-        //         }
-        //     }
-        // }
+        for (const process_inst of processNode.process){
+            y_position += nodeGap;
+           if (process_inst.points_to){
+                newNode.push({
+                    id: `function_${processNode.token}_variable_${process_inst.token}`,
+                    type: 'variableNode',
+                    position: { x: 0, y: y_position },
+                    data: {
+                        name: process_inst.token,
+                    },
+                    draggable:true,
+                    extent: 'parent',
+                    parentId: `function_${processNode.token}`,
+                })
+                for (const point_to of process_inst.points_to){
+                    if (point_to.func_token != 'unknown_func'){
+                        newNode.push({
+                            id: `function_call_${point_to.func_token}`,
+                            type: 'functionNode',
+                            position: { x: x_pos, y: y_position },
+                            data: {
+                                name: point_to.func_token,
+                            },
+                            extent: 'parent',
+                            parentId: `function_${processNode.token}`,
+                        })    
+                    }else{
+                        point_to.inputs.forEach((input: string) => {
+                            newEdge.push({
+                                id: `${processNode.token}_${process_inst.token}_${input}`,
+                                source: `function_${processNode.token}_variable_${input}`,
+                                target: `function_${processNode.token}_variable_${process_inst.token}`,
+                            })
+                        })
+                    }
+                    
+                }
+            }
+        }
 
         return [newNode, newEdge];
 

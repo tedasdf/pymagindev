@@ -15,7 +15,8 @@ const FileNode = ({
             style={{
                 border: "1px dashed black",
                 height: data.height,
-                width: data.width
+                width: data.width,
+                position: 'absolute',
             }}
             className="rounded-[4px] text-[10px] text-black"
         >

@@ -104,7 +104,7 @@ def make_file_group(tree, file_path, raw_source_paths):
     ## the if statement is inflexible so NEXT PR need to figure out how to improve that 
     for subgroup_tree in subgroup_trees:
         file_inst.add_classes_list(language.make_class(subgroup_tree, parent=file_inst))
-
+    
     return file_inst
 
 

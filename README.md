@@ -11,12 +11,28 @@
 - [ ] Class visualization (in progress)
 - [ ] Function argument handling (in progress)
 
+### File Input Features (FULLSTACK)
+- [ ] Add file URL input field
+- [ ] Support local file import
+- [ ] Support GitHub repository URL import
+- [ ] Add file validation
+- [ ] Error handling for invalid files
+
+
+### Function Processing (BACKEND)
+- [x] Implement argument passing in functions
+- [ ] Handle variable as function cases
+- [ ] Process nested function calls
+- [ ] Track variable scope
+
+
+
 ## Frontend Tasks
 
 ### Node Styling & Sizing
 - [ ] Implement dynamic node sizing based on content
 - [ ] Fix node positioning and overlap issues
-- [ ] Add proper padding and margins
+- [x] Add proper padding and margins
 - [ ] Improve visual hierarchy of nodes
 
 ### Process Node Enhancement
@@ -32,12 +48,6 @@
 - [ ] Create consistent naming pattern for edges
 - [ ] Document ID structure
 
-### File Input Features
-- [ ] Add file URL input field
-- [ ] Support local file import
-- [ ] Support GitHub repository URL import
-- [ ] Add file validation
-- [ ] Error handling for invalid files
 
 ### Class Visualization
 - [ ] Display class attributes
@@ -46,12 +56,6 @@
 - [ ] Add class instance visualization
 
 ## Backend Tasks
-
-### Function Processing
-- [ ] Implement argument passing in functions
-- [ ] Handle variable as function cases
-- [ ] Process nested function calls
-- [ ] Track variable scope
 
 ### Class Processing
 - [ ] Handle class function calls

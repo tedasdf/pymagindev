@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { NodeTag } from "./NodeTag";
 import { fetchAndCreateProcess } from "../../../utils/helper";
 
@@ -21,12 +21,15 @@ const SymbolNode = ({
     const token_name = data.SymbolName;
     const type = data.type;
     const parent_token = data.parentToken;
+    const [isSelected, setIsSelected] = useState(false);
     // const input_length = data.input?.length ?? 0;
     // const output_length = data.output?.length ?? 0;
 
     const handleClick = async () => {
+        setIsSelected(!isSelected);
         if (type === 'function') {
             console.log('Function clicked:', token_name);
+            console.log(parent_token);
             try {
                 const [newNode, newEdge] = await fetchAndCreateProcess('..test.test_example10.functional', token_name);
                 console.log(newNode);
@@ -53,7 +56,7 @@ const SymbolNode = ({
             key={token_name}
             style={{
                 backgroundColor: "rgba(145, 29, 201, 0.05)" ,
-                border: "1px dashed black",
+                border: `1px ${isSelected ? 'solid' : 'dashed'} black`,
                 borderRadius: "4px",
                 position: 'relative'
             }}

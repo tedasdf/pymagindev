@@ -131,6 +131,7 @@ export const fetchAndCreateProcess = async (fileToken: string, functionName: str
                     position: { x: 0, y: y_position },
                     data: {
                         name: process_inst.token,
+                        isprocess: false
                     },
                     draggable:true,
                     extent: 'parent',
@@ -140,14 +141,29 @@ export const fetchAndCreateProcess = async (fileToken: string, functionName: str
                     if (point_to.func_token != 'unknown_func'){
                         newNode.push({
                             id: `function_call_${point_to.func_token}`,
-                            type: 'functionNode',
+                            type: 'processFunctionNode',
                             position: { x: x_pos, y: y_position },
                             data: {
                                 name: point_to.func_token,
+                                isprocess: true,
+                                input: point_to.inputs,
+                                output: process_inst.token
+                            },
+                            style: {
+                                width: 100,
+                                height: 100,
                             },
                             extent: 'parent',
                             parentId: `function_${processNode.token}`,
                         })    
+                        point_to.inputs.forEach((input: string, index) => {
+                            newEdge.push({
+                                id: `${processNode.token}_call_${point_to.func_token}_${input}`,
+                                source: `function_${processNode.token}_variable_${input}`,
+                                target: `function_call_${point_to.func_token}`,
+                                targetHandle: `input-${index}`
+                            })
+                        })
                     }else{
                         point_to.inputs.forEach((input: string) => {
                             newEdge.push({
